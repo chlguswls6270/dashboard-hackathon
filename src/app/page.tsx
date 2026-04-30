@@ -1,65 +1,289 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect, useCallback } from 'react';
+import { CATEGORY_META, type CategoryKey, type ProcessedData, type AlertItem } from '@/lib/types';
+import { saveToCache, loadAllFromCache, clearCache } from '@/lib/cache';
+import Sidebar from '@/components/Sidebar';
+import Header from '@/components/Header';
+import UploadPanel from '@/components/UploadPanel';
+import CategorySummaryPage from '@/components/CategorySummaryPage';
+import DataViewer from '@/components/DataViewer';
+import HomeDashboard from '@/components/HomeDashboard';
+import LoginOverlay from '@/components/LoginOverlay';
+import MyPageDashboard from '@/components/MyPageDashboard';
+import PortfolioFeedPage from '@/components/PortfolioFeedPage';
+
+export default function DashboardPage() {
+  const [cachedData, setCachedData] = useState<ProcessedData[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('home');
+  const [activeItem, setActiveItem] = useState<ProcessedData | null>(null);
+  const [processing, setProcessing] = useState(false);
+  const [processingName, setProcessingName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  // User State
+  const [userName, setUserName] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [recentViews, setRecentViews] = useState<string[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [isClient, setIsClient] = useState(false);
+
+  // Load user data on mount
+  useEffect(() => {
+    setIsClient(true);
+    const savedName = localStorage.getItem('userName');
+    if (savedName) setUserName(savedName);
+    
+    const savedFavs = localStorage.getItem('favorites');
+    if (savedFavs) setFavorites(JSON.parse(savedFavs));
+    
+    const savedViews = localStorage.getItem('recentViews');
+    if (savedViews) setRecentViews(JSON.parse(savedViews));
+
+    const savedAlerts = localStorage.getItem('alerts');
+    if (savedAlerts) setAlerts(JSON.parse(savedAlerts));
+  }, []);
+
+  const handleLogin = (name: string) => {
+    localStorage.setItem('userName', name);
+    setUserName(name);
+  };
+
+  const handleToggleFavorite = (id: string) => {
+    setFavorites(prev => {
+      const next = prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id];
+      localStorage.setItem('favorites', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleAddAlert = (alert: Omit<AlertItem, 'id' | 'createdAt'>) => {
+    const newAlert: AlertItem = {
+      ...alert,
+      id: `alert_${Date.now()}`,
+      createdAt: Date.now()
+    };
+    setAlerts(prev => {
+      const next = [newAlert, ...prev];
+      localStorage.setItem('alerts', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleToggleAlert = (id: string) => {
+    setAlerts(prev => {
+      const next = prev.map(a => a.id === id ? { ...a, active: !a.active } : a);
+      localStorage.setItem('alerts', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleDeleteAlert = (id: string) => {
+    setAlerts(prev => {
+      const next = prev.filter(a => a.id !== id);
+      localStorage.setItem('alerts', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const refreshCache = async () => {
+    const items = await loadAllFromCache();
+    setCachedData(items);
+  };
+
+  // Load all cached items on mount
+  useEffect(() => {
+    refreshCache().then(async () => {
+      const items = await loadAllFromCache();
+      if (items.length === 0) {
+        setProcessing(true);
+        try {
+          const res = await fetch('/api/dummy/all');
+          const result = await res.json();
+          if (result.items) {
+            // Save all items to cache
+            for (const item of result.items) {
+              await saveToCache(item);
+            }
+            await refreshCache();
+          }
+        } catch (err) {
+          console.error("Failed to auto-load dummy data", err);
+        } finally {
+          setProcessing(false);
+        }
+      }
+    });
+  }, []);
+
+  const handleProcess = async (file: File | null, dummyCat?: string) => {
+    setProcessing(true);
+    setError(null);
+    try {
+      if (dummyCat) {
+        setProcessingName(`${CATEGORY_META[dummyCat as CategoryKey].ko} 데이터`);
+        const res = await fetch(`/api/dummy/category/${dummyCat}`);
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
+        
+        // Save all items to cache
+        for (const item of result.items) {
+          await saveToCache(item);
+        }
+        
+        await refreshCache();
+        setActiveTab(dummyCat);
+        setActiveItem(null);
+      } else if (file) {
+        setProcessingName(file.name);
+        const text = await file.text();
+        const res = await fetch('/api/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rawData: text, fileName: file.name }),
+        });
+        const result = await res.json();
+        if (result.error) throw new Error(result.error);
+        
+        // Handle single item upload
+        const item = result.data;
+        // Use a generated id if not present
+        if (!item.id) item.id = `${item.category}_${Date.now()}`;
+        item.data.isUserUploaded = true;
+        
+        await saveToCache(item);
+        await refreshCache();
+        setActiveTab(item.category);
+        setActiveItem(item);
+      }
+    } catch (err: any) {
+      setError(err.message || '데이터 처리 중 오류가 발생했습니다.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleClearCache = useCallback(async () => {
+    await clearCache();
+    setActiveTab('home');
+    setActiveItem(null);
+  }, []);
+
+  const handleSelectTab = async (tab: string) => {
+    setActiveTab(tab);
+    setActiveItem(null);
+
+    // 카테고리 탭이면 항상 최신 API 데이터로 갱신 (캐시 stale 방지)
+    const validCategories = Object.keys(CATEGORY_META) as CategoryKey[];
+    if (validCategories.includes(tab as CategoryKey)) {
+      try {
+        const res = await fetch(`/api/dummy/category/${tab}`);
+        const result = await res.json();
+        if (result.items) {
+          for (const item of result.items) {
+            await saveToCache(item);
+          }
+          await refreshCache();
+        }
+      } catch (err) {
+        console.warn('Failed to refresh category data:', err);
+      }
+    }
+  };
+
+  const handleSelectItem = (item: ProcessedData) => {
+    setActiveTab(item.category);
+    setActiveItem(item);
+    
+    // Track recent views
+    setRecentViews(prev => {
+      const next = [item.id, ...prev.filter(id => id !== item.id)].slice(0, 10);
+      localStorage.setItem('recentViews', JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const handleBackToSummary = () => {
+    setActiveItem(null);
+  };
+
+  const activeCategory = Object.keys(CATEGORY_META).includes(activeTab) ? activeTab as CategoryKey : null;
+  const activeCategoryItems = activeCategory ? cachedData.filter(d => d.category === activeCategory) : [];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex h-screen overflow-hidden bg-grid" style={{ background: 'var(--bg-primary)' }}>
+      {isClient && !userName && <LoginOverlay onLogin={handleLogin} />}
+      
+      {/* Sidebar */}
+      <Sidebar
+        cachedData={cachedData}
+        activeTab={activeTab}
+        onSelectTab={handleSelectTab}
+        onClearCache={handleClearCache}
+      />
+
+      {/* Main */}
+      <div className="flex flex-col flex-1 overflow-hidden">
+        <Header 
+          activeData={activeItem}
+          onBack={activeItem ? handleBackToSummary : undefined}
+          userName={userName}
+          onUserClick={() => { setActiveTab('mypage'); setActiveItem(null); }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        <main className="flex-1 overflow-auto" style={{ padding: '40px 48px' }}>
+          {activeTab === 'mypage' && userName ? (
+            <MyPageDashboard 
+              userName={userName}
+              cachedData={cachedData}
+              favorites={favorites}
+              recentViews={recentViews}
+              alerts={alerts}
+              onSelectItem={handleSelectItem}
+              onAddAlert={handleAddAlert}
+              onToggleAlert={handleToggleAlert}
+              onDeleteAlert={handleDeleteAlert}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          ) : activeTab === 'upload' ? (
+            <UploadPanel
+              onProcess={handleProcess}
+              processing={processing}
+              processingName={processingName}
+              error={error}
+              onClose={() => setActiveTab('home')}
+            />
+          ) : activeTab === 'home' ? (
+            <HomeDashboard 
+              cachedData={cachedData} 
+              onSelectTab={handleSelectTab} 
+              onSelectItem={handleSelectItem} 
+            />
+          ) : activeCategory && !activeItem && activeCategory === 'portfolio' ? (
+            <PortfolioFeedPage
+              items={activeCategoryItems}
+              onSelectItem={handleSelectItem}
+            />
+          ) : activeCategory && !activeItem ? (
+            <CategorySummaryPage
+              category={activeCategory}
+              items={activeCategoryItems}
+              onSelectItem={handleSelectItem}
+            />
+          ) : activeItem ? (
+            <DataViewer 
+              data={activeItem} 
+              isFavorite={favorites.includes(activeItem.id)}
+              onToggleFavorite={() => handleToggleFavorite(activeItem.id)}
+            />
+          ) : (
+            <HomeDashboard 
+              cachedData={cachedData} 
+              onSelectTab={handleSelectTab} 
+              onSelectItem={handleSelectItem} 
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

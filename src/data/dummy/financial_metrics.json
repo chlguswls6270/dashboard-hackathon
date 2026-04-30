@@ -1,0 +1,81 @@
+{
+  "ticker": "005930",
+  "name": "삼성전자",
+  "metrics": {
+    "peRatio": 14.2,
+    "pbRatio": 1.8,
+    "psRatio": 1.9,
+    "evEbitda": 8.3,
+    "eps": 4823,
+    "bps": 42500,
+    "dps": 1444,
+    "roe": 12.8,
+    "roa": 7.4,
+    "roic": 11.2,
+    "debtRatio": 35.4,
+    "currentRatio": 2.31,
+    "quickRatio": 1.87,
+    "operatingMargin": 15.4,
+    "netMargin": 12.1,
+    "grossMargin": 38.2,
+    "revenueGrowth": 8.3,
+    "earningsGrowth": 14.7
+  },
+  "historicalMetrics": [
+    {
+      "year": 2020,
+      "eps": 3200,
+      "roe": 10,
+      "revenue": 236800,
+      "netIncome": 26500
+    },
+    {
+      "year": 2021,
+      "eps": 3600,
+      "roe": 10.7,
+      "revenue": 251800,
+      "netIncome": 29500
+    },
+    {
+      "year": 2022,
+      "eps": 4000,
+      "roe": 11.4,
+      "revenue": 266800,
+      "netIncome": 32500
+    },
+    {
+      "year": 2023,
+      "eps": 4400,
+      "roe": 12.1,
+      "revenue": 281800,
+      "netIncome": 35500
+    },
+    {
+      "year": 2024,
+      "eps": 4800,
+      "roe": 12.8,
+      "revenue": 296800,
+      "netIncome": 38500
+    }
+  ],
+  "peerComparison": [
+    {
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "peRatio": 18.5,
+      "roe": 9.2
+    },
+    {
+      "ticker": "TSMC",
+      "name": "TSMC",
+      "peRatio": 22.3,
+      "roe": 28.4
+    },
+    {
+      "ticker": "INTC",
+      "name": "Intel",
+      "peRatio": 28.1,
+      "roe": 4.3
+    }
+  ]
+}

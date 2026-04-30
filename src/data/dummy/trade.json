@@ -1,0 +1,512 @@
+{
+  "account": "종합계좌-1234",
+  "trades": [
+    {
+      "date": "2026-02-23",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "buy",
+      "quantity": 13,
+      "price": 51311,
+      "amount": 667043,
+      "fee": 100
+    },
+    {
+      "date": "2026-02-24",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "sell",
+      "quantity": 12,
+      "price": 116679,
+      "amount": 1400148,
+      "fee": 210
+    },
+    {
+      "date": "2026-02-25",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "sell",
+      "quantity": 13,
+      "price": 91160,
+      "amount": 1185080,
+      "fee": 177
+    },
+    {
+      "date": "2026-02-26",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "sell",
+      "quantity": 15,
+      "price": 103003,
+      "amount": 1545045,
+      "fee": 231
+    },
+    {
+      "date": "2026-02-28",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 3,
+      "price": 140411,
+      "amount": 421233,
+      "fee": 63
+    },
+    {
+      "date": "2026-03-01",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "sell",
+      "quantity": 20,
+      "price": 129192,
+      "amount": 2583840,
+      "fee": 387
+    },
+    {
+      "date": "2026-03-02",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 5,
+      "price": 142409,
+      "amount": 712045,
+      "fee": 106
+    },
+    {
+      "date": "2026-03-04",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 16,
+      "price": 130467,
+      "amount": 2087472,
+      "fee": 313
+    },
+    {
+      "date": "2026-03-05",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 20,
+      "price": 124679,
+      "amount": 2493580,
+      "fee": 374
+    },
+    {
+      "date": "2026-03-06",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "sell",
+      "quantity": 5,
+      "price": 82742,
+      "amount": 413710,
+      "fee": 62
+    },
+    {
+      "date": "2026-03-08",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "sell",
+      "quantity": 5,
+      "price": 72269,
+      "amount": 361345,
+      "fee": 54
+    },
+    {
+      "date": "2026-03-09",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 12,
+      "price": 75354,
+      "amount": 904248,
+      "fee": 135
+    },
+    {
+      "date": "2026-03-10",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 12,
+      "price": 108858,
+      "amount": 1306296,
+      "fee": 195
+    },
+    {
+      "date": "2026-03-11",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "buy",
+      "quantity": 3,
+      "price": 144119,
+      "amount": 432357,
+      "fee": 64
+    },
+    {
+      "date": "2026-03-13",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "buy",
+      "quantity": 11,
+      "price": 65917,
+      "amount": 725087,
+      "fee": 108
+    },
+    {
+      "date": "2026-03-14",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "sell",
+      "quantity": 18,
+      "price": 91356,
+      "amount": 1644408,
+      "fee": 246
+    },
+    {
+      "date": "2026-03-15",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "sell",
+      "quantity": 12,
+      "price": 59467,
+      "amount": 713604,
+      "fee": 107
+    },
+    {
+      "date": "2026-03-17",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "buy",
+      "quantity": 12,
+      "price": 148503,
+      "amount": 1782036,
+      "fee": 267
+    },
+    {
+      "date": "2026-03-18",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 18,
+      "price": 70562,
+      "amount": 1270116,
+      "fee": 190
+    },
+    {
+      "date": "2026-03-19",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "buy",
+      "quantity": 5,
+      "price": 125302,
+      "amount": 626510,
+      "fee": 93
+    },
+    {
+      "date": "2026-03-21",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 10,
+      "price": 54600,
+      "amount": 546000,
+      "fee": 81
+    },
+    {
+      "date": "2026-03-22",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 13,
+      "price": 140087,
+      "amount": 1821131,
+      "fee": 273
+    },
+    {
+      "date": "2026-03-23",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "sell",
+      "quantity": 8,
+      "price": 113159,
+      "amount": 905272,
+      "fee": 135
+    },
+    {
+      "date": "2026-03-24",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "sell",
+      "quantity": 11,
+      "price": 111828,
+      "amount": 1230108,
+      "fee": 184
+    },
+    {
+      "date": "2026-03-26",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "sell",
+      "quantity": 1,
+      "price": 147534,
+      "amount": 147534,
+      "fee": 22
+    },
+    {
+      "date": "2026-03-27",
+      "ticker": "035420",
+      "name": "NAVER",
+      "side": "sell",
+      "quantity": 8,
+      "price": 141253,
+      "amount": 1130024,
+      "fee": 169
+    },
+    {
+      "date": "2026-03-28",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "buy",
+      "quantity": 11,
+      "price": 123159,
+      "amount": 1354749,
+      "fee": 203
+    },
+    {
+      "date": "2026-03-30",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "buy",
+      "quantity": 5,
+      "price": 96982,
+      "amount": 484910,
+      "fee": 72
+    },
+    {
+      "date": "2026-03-31",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 9,
+      "price": 99405,
+      "amount": 894645,
+      "fee": 134
+    },
+    {
+      "date": "2026-04-01",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "buy",
+      "quantity": 7,
+      "price": 124041,
+      "amount": 868287,
+      "fee": 130
+    },
+    {
+      "date": "2026-04-03",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 15,
+      "price": 147794,
+      "amount": 2216910,
+      "fee": 332
+    },
+    {
+      "date": "2026-04-04",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "buy",
+      "quantity": 13,
+      "price": 108399,
+      "amount": 1409187,
+      "fee": 211
+    },
+    {
+      "date": "2026-04-05",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "buy",
+      "quantity": 4,
+      "price": 112623,
+      "amount": 450492,
+      "fee": 67
+    },
+    {
+      "date": "2026-04-06",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "buy",
+      "quantity": 11,
+      "price": 128848,
+      "amount": 1417328,
+      "fee": 212
+    },
+    {
+      "date": "2026-04-08",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "sell",
+      "quantity": 14,
+      "price": 112814,
+      "amount": 1579396,
+      "fee": 236
+    },
+    {
+      "date": "2026-04-09",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 1,
+      "price": 148932,
+      "amount": 148932,
+      "fee": 22
+    },
+    {
+      "date": "2026-04-10",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "buy",
+      "quantity": 7,
+      "price": 68885,
+      "amount": 482195,
+      "fee": 72
+    },
+    {
+      "date": "2026-04-12",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 5,
+      "price": 65783,
+      "amount": 328915,
+      "fee": 49
+    },
+    {
+      "date": "2026-04-13",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "buy",
+      "quantity": 3,
+      "price": 122910,
+      "amount": 368730,
+      "fee": 55
+    },
+    {
+      "date": "2026-04-14",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 11,
+      "price": 64014,
+      "amount": 704154,
+      "fee": 105
+    },
+    {
+      "date": "2026-04-16",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "buy",
+      "quantity": 17,
+      "price": 99840,
+      "amount": 1697280,
+      "fee": 254
+    },
+    {
+      "date": "2026-04-17",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 6,
+      "price": 149636,
+      "amount": 897816,
+      "fee": 134
+    },
+    {
+      "date": "2026-04-18",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 4,
+      "price": 86185,
+      "amount": 344740,
+      "fee": 51
+    },
+    {
+      "date": "2026-04-19",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 17,
+      "price": 132069,
+      "amount": 2245173,
+      "fee": 336
+    },
+    {
+      "date": "2026-04-21",
+      "ticker": "000660",
+      "name": "SK하이닉스",
+      "side": "sell",
+      "quantity": 18,
+      "price": 129090,
+      "amount": 2323620,
+      "fee": 348
+    },
+    {
+      "date": "2026-04-22",
+      "ticker": "207940",
+      "name": "삼성바이오",
+      "side": "sell",
+      "quantity": 20,
+      "price": 118910,
+      "amount": 2378200,
+      "fee": 356
+    },
+    {
+      "date": "2026-04-23",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "sell",
+      "quantity": 18,
+      "price": 108067,
+      "amount": 1945206,
+      "fee": 291
+    },
+    {
+      "date": "2026-04-25",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "side": "buy",
+      "quantity": 5,
+      "price": 142843,
+      "amount": 714215,
+      "fee": 107
+    },
+    {
+      "date": "2026-04-26",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "buy",
+      "quantity": 3,
+      "price": 50141,
+      "amount": 150423,
+      "fee": 22
+    },
+    {
+      "date": "2026-04-27",
+      "ticker": "005380",
+      "name": "현대차",
+      "side": "sell",
+      "quantity": 15,
+      "price": 82149,
+      "amount": 1232235,
+      "fee": 184
+    }
+  ],
+  "summary": {
+    "totalTrades": 50,
+    "totalBuy": 25000000,
+    "totalSell": 23000000,
+    "totalFees": 72000,
+    "realizedPnL": 1850000
+  }
+}

@@ -1,0 +1,645 @@
+{
+  "country": "대한민국",
+  "indicators": {
+    "gdpGrowth": 2.3,
+    "cpi": 2.3,
+    "coreCpi": 2.1,
+    "unemploymentRate": 3.1,
+    "baseRate": 3.5,
+    "tradeBalance": 3520,
+    "currentAccount": 8420,
+    "m2Growth": 4.8
+  },
+  "history": [
+    {
+      "date": "2026-01-29",
+      "gdpGrowth": 2.1,
+      "cpi": 2.3,
+      "unemploymentRate": 3.1,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-01-30",
+      "gdpGrowth": 2.12,
+      "cpi": 2.32,
+      "unemploymentRate": 3.11,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-01-31",
+      "gdpGrowth": 2.15,
+      "cpi": 2.34,
+      "unemploymentRate": 3.12,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-01",
+      "gdpGrowth": 2.17,
+      "cpi": 2.36,
+      "unemploymentRate": 3.12,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-02",
+      "gdpGrowth": 2.2,
+      "cpi": 2.38,
+      "unemploymentRate": 3.13,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-03",
+      "gdpGrowth": 2.22,
+      "cpi": 2.4,
+      "unemploymentRate": 3.14,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-04",
+      "gdpGrowth": 2.25,
+      "cpi": 2.42,
+      "unemploymentRate": 3.15,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-05",
+      "gdpGrowth": 2.27,
+      "cpi": 2.43,
+      "unemploymentRate": 3.16,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-06",
+      "gdpGrowth": 2.29,
+      "cpi": 2.45,
+      "unemploymentRate": 3.16,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-07",
+      "gdpGrowth": 2.32,
+      "cpi": 2.47,
+      "unemploymentRate": 3.17,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-08",
+      "gdpGrowth": 2.34,
+      "cpi": 2.49,
+      "unemploymentRate": 3.18,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-09",
+      "gdpGrowth": 2.36,
+      "cpi": 2.5,
+      "unemploymentRate": 3.19,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-10",
+      "gdpGrowth": 2.38,
+      "cpi": 2.52,
+      "unemploymentRate": 3.19,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-11",
+      "gdpGrowth": 2.4,
+      "cpi": 2.53,
+      "unemploymentRate": 3.2,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-12",
+      "gdpGrowth": 2.42,
+      "cpi": 2.54,
+      "unemploymentRate": 3.21,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-13",
+      "gdpGrowth": 2.44,
+      "cpi": 2.55,
+      "unemploymentRate": 3.21,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-14",
+      "gdpGrowth": 2.46,
+      "cpi": 2.56,
+      "unemploymentRate": 3.22,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-15",
+      "gdpGrowth": 2.48,
+      "cpi": 2.57,
+      "unemploymentRate": 3.23,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-16",
+      "gdpGrowth": 2.49,
+      "cpi": 2.58,
+      "unemploymentRate": 3.23,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-17",
+      "gdpGrowth": 2.51,
+      "cpi": 2.59,
+      "unemploymentRate": 3.24,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-18",
+      "gdpGrowth": 2.52,
+      "cpi": 2.59,
+      "unemploymentRate": 3.24,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-19",
+      "gdpGrowth": 2.53,
+      "cpi": 2.6,
+      "unemploymentRate": 3.25,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-20",
+      "gdpGrowth": 2.55,
+      "cpi": 2.6,
+      "unemploymentRate": 3.25,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-21",
+      "gdpGrowth": 2.56,
+      "cpi": 2.6,
+      "unemploymentRate": 3.26,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-22",
+      "gdpGrowth": 2.57,
+      "cpi": 2.6,
+      "unemploymentRate": 3.26,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-23",
+      "gdpGrowth": 2.57,
+      "cpi": 2.6,
+      "unemploymentRate": 3.27,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-24",
+      "gdpGrowth": 2.58,
+      "cpi": 2.6,
+      "unemploymentRate": 3.27,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-25",
+      "gdpGrowth": 2.59,
+      "cpi": 2.59,
+      "unemploymentRate": 3.28,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-26",
+      "gdpGrowth": 2.59,
+      "cpi": 2.59,
+      "unemploymentRate": 3.28,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-27",
+      "gdpGrowth": 2.6,
+      "cpi": 2.58,
+      "unemploymentRate": 3.28,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-02-28",
+      "gdpGrowth": 2.6,
+      "cpi": 2.57,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-01",
+      "gdpGrowth": 2.6,
+      "cpi": 2.56,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-02",
+      "gdpGrowth": 2.6,
+      "cpi": 2.55,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-03",
+      "gdpGrowth": 2.6,
+      "cpi": 2.54,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-04",
+      "gdpGrowth": 2.6,
+      "cpi": 2.53,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-05",
+      "gdpGrowth": 2.59,
+      "cpi": 2.52,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-06",
+      "gdpGrowth": 2.59,
+      "cpi": 2.5,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-07",
+      "gdpGrowth": 2.58,
+      "cpi": 2.49,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-08",
+      "gdpGrowth": 2.57,
+      "cpi": 2.47,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-09",
+      "gdpGrowth": 2.56,
+      "cpi": 2.45,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-10",
+      "gdpGrowth": 2.55,
+      "cpi": 2.44,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-11",
+      "gdpGrowth": 2.54,
+      "cpi": 2.42,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-12",
+      "gdpGrowth": 2.53,
+      "cpi": 2.4,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-13",
+      "gdpGrowth": 2.52,
+      "cpi": 2.38,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-14",
+      "gdpGrowth": 2.5,
+      "cpi": 2.36,
+      "unemploymentRate": 3.3,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-15",
+      "gdpGrowth": 2.49,
+      "cpi": 2.34,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-16",
+      "gdpGrowth": 2.47,
+      "cpi": 2.32,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-17",
+      "gdpGrowth": 2.46,
+      "cpi": 2.3,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-18",
+      "gdpGrowth": 2.44,
+      "cpi": 2.28,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-19",
+      "gdpGrowth": 2.42,
+      "cpi": 2.26,
+      "unemploymentRate": 3.29,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-20",
+      "gdpGrowth": 2.4,
+      "cpi": 2.24,
+      "unemploymentRate": 3.28,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-21",
+      "gdpGrowth": 2.38,
+      "cpi": 2.22,
+      "unemploymentRate": 3.28,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-22",
+      "gdpGrowth": 2.36,
+      "cpi": 2.2,
+      "unemploymentRate": 3.27,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-23",
+      "gdpGrowth": 2.34,
+      "cpi": 2.19,
+      "unemploymentRate": 3.27,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-24",
+      "gdpGrowth": 2.31,
+      "cpi": 2.17,
+      "unemploymentRate": 3.27,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-25",
+      "gdpGrowth": 2.29,
+      "cpi": 2.15,
+      "unemploymentRate": 3.26,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-26",
+      "gdpGrowth": 2.27,
+      "cpi": 2.13,
+      "unemploymentRate": 3.26,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-27",
+      "gdpGrowth": 2.24,
+      "cpi": 2.12,
+      "unemploymentRate": 3.25,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-28",
+      "gdpGrowth": 2.22,
+      "cpi": 2.1,
+      "unemploymentRate": 3.25,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-29",
+      "gdpGrowth": 2.2,
+      "cpi": 2.09,
+      "unemploymentRate": 3.24,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-30",
+      "gdpGrowth": 2.17,
+      "cpi": 2.07,
+      "unemploymentRate": 3.24,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-03-31",
+      "gdpGrowth": 2.15,
+      "cpi": 2.06,
+      "unemploymentRate": 3.23,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-01",
+      "gdpGrowth": 2.12,
+      "cpi": 2.05,
+      "unemploymentRate": 3.22,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-02",
+      "gdpGrowth": 2.1,
+      "cpi": 2.04,
+      "unemploymentRate": 3.22,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-03",
+      "gdpGrowth": 2.07,
+      "cpi": 2.03,
+      "unemploymentRate": 3.21,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-04",
+      "gdpGrowth": 2.05,
+      "cpi": 2.02,
+      "unemploymentRate": 3.2,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-05",
+      "gdpGrowth": 2.02,
+      "cpi": 2.01,
+      "unemploymentRate": 3.2,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-06",
+      "gdpGrowth": 2,
+      "cpi": 2.01,
+      "unemploymentRate": 3.19,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-07",
+      "gdpGrowth": 1.97,
+      "cpi": 2,
+      "unemploymentRate": 3.18,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-08",
+      "gdpGrowth": 1.95,
+      "cpi": 2,
+      "unemploymentRate": 3.17,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-09",
+      "gdpGrowth": 1.92,
+      "cpi": 2,
+      "unemploymentRate": 3.17,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-10",
+      "gdpGrowth": 1.9,
+      "cpi": 2,
+      "unemploymentRate": 3.16,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-11",
+      "gdpGrowth": 1.88,
+      "cpi": 2,
+      "unemploymentRate": 3.15,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-12",
+      "gdpGrowth": 1.86,
+      "cpi": 2,
+      "unemploymentRate": 3.14,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-13",
+      "gdpGrowth": 1.84,
+      "cpi": 2.01,
+      "unemploymentRate": 3.14,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-14",
+      "gdpGrowth": 1.81,
+      "cpi": 2.01,
+      "unemploymentRate": 3.13,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-15",
+      "gdpGrowth": 1.79,
+      "cpi": 2.02,
+      "unemploymentRate": 3.12,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-16",
+      "gdpGrowth": 1.77,
+      "cpi": 2.03,
+      "unemploymentRate": 3.11,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-17",
+      "gdpGrowth": 1.76,
+      "cpi": 2.03,
+      "unemploymentRate": 3.1,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-18",
+      "gdpGrowth": 1.74,
+      "cpi": 2.04,
+      "unemploymentRate": 3.1,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-19",
+      "gdpGrowth": 1.72,
+      "cpi": 2.06,
+      "unemploymentRate": 3.09,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-20",
+      "gdpGrowth": 1.71,
+      "cpi": 2.07,
+      "unemploymentRate": 3.08,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-21",
+      "gdpGrowth": 1.69,
+      "cpi": 2.08,
+      "unemploymentRate": 3.07,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-22",
+      "gdpGrowth": 1.68,
+      "cpi": 2.1,
+      "unemploymentRate": 3.06,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-23",
+      "gdpGrowth": 1.66,
+      "cpi": 2.11,
+      "unemploymentRate": 3.06,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-24",
+      "gdpGrowth": 1.65,
+      "cpi": 2.13,
+      "unemploymentRate": 3.05,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-25",
+      "gdpGrowth": 1.64,
+      "cpi": 2.14,
+      "unemploymentRate": 3.04,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-26",
+      "gdpGrowth": 1.63,
+      "cpi": 2.16,
+      "unemploymentRate": 3.03,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-27",
+      "gdpGrowth": 1.62,
+      "cpi": 2.18,
+      "unemploymentRate": 3.03,
+      "baseRate": 3.5
+    },
+    {
+      "date": "2026-04-28",
+      "gdpGrowth": 1.62,
+      "cpi": 2.2,
+      "unemploymentRate": 3.02,
+      "baseRate": 3.5
+    }
+  ]
+}

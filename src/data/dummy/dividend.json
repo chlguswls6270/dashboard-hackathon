@@ -1,0 +1,155 @@
+{
+  "ticker": "005930",
+  "name": "삼성전자",
+  "currentYield": 2.1,
+  "annualDividend": 1444,
+  "payoutRatio": 28.4,
+  "dividendGrowthRate": 8.2,
+  "consecutiveYears": 12,
+  "dividendHistory": [
+    {
+      "exDate": "2019-12-28",
+      "payDate": "2020-01-15",
+      "amount": 354,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2019-09-28",
+      "payDate": "2019-10-15",
+      "amount": 354,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2019-06-28",
+      "payDate": "2019-07-15",
+      "amount": 354,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2019-03-28",
+      "payDate": "2019-04-15",
+      "amount": 354,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2020-12-28",
+      "payDate": "2021-01-15",
+      "amount": 414,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2020-09-28",
+      "payDate": "2020-10-15",
+      "amount": 414,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2020-06-28",
+      "payDate": "2020-07-15",
+      "amount": 414,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2020-03-28",
+      "payDate": "2020-04-15",
+      "amount": 414,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2021-12-28",
+      "payDate": "2022-01-15",
+      "amount": 474,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2021-09-28",
+      "payDate": "2021-10-15",
+      "amount": 474,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2021-06-28",
+      "payDate": "2021-07-15",
+      "amount": 474,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2021-03-28",
+      "payDate": "2021-04-15",
+      "amount": 474,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2022-12-28",
+      "payDate": "2023-01-15",
+      "amount": 534,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2022-09-28",
+      "payDate": "2022-10-15",
+      "amount": 534,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2022-06-28",
+      "payDate": "2022-07-15",
+      "amount": 534,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2022-03-28",
+      "payDate": "2022-04-15",
+      "amount": 534,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2023-12-28",
+      "payDate": "2024-01-15",
+      "amount": 594,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2023-09-28",
+      "payDate": "2023-10-15",
+      "amount": 594,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2023-06-28",
+      "payDate": "2023-07-15",
+      "amount": 594,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2023-03-28",
+      "payDate": "2023-04-15",
+      "amount": 594,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2024-12-28",
+      "payDate": "2025-01-15",
+      "amount": 654,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2024-09-28",
+      "payDate": "2024-10-15",
+      "amount": 654,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2024-06-28",
+      "payDate": "2024-07-15",
+      "amount": 654,
+      "frequency": "quarterly"
+    },
+    {
+      "exDate": "2024-03-28",
+      "payDate": "2024-04-15",
+      "amount": 654,
+      "frequency": "quarterly"
+    }
+  ]
+}
