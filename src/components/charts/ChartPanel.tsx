@@ -259,41 +259,43 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
             <span style={{ fontSize:10, color: hintColor, fontWeight:700, background:`${hintColor}1a`, padding:'2px 7px', borderRadius:5 }}>{hint}</span>
           )}
           {/* ⓘ 버튼 */}
-          <div
-            ref={iconRef}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={() => setShowTip(false)}
-            style={{ position:'relative', cursor:'default', display:'flex', alignItems:'center' }}
-          >
-            <span style={{
-              display:'flex', alignItems:'center', justifyContent:'center',
-              width:16, height:16, borderRadius:'50%',
-              border:'1px solid rgba(255,255,255,0.22)', fontSize:10,
-              color:'rgba(255,255,255,0.4)', fontWeight:700,
-              userSelect:'none',
-            }}>i</span>
-            {showTip && (
-              <div style={{
-                position:'absolute', 
-                ...(tipPos === 'top' ? { bottom:'calc(100% + 8px)' } : { top:'calc(100% + 8px)' }),
-                right:-8, width: 220,
-                background:'rgba(10,14,26,0.97)', border:'1px solid rgba(255,255,255,0.12)',
-                borderRadius:8, padding:'10px 14px', whiteSpace:'normal', wordBreak:'keep-all',
-                fontSize:12, color:'rgba(255,255,255,0.85)', zIndex:999,
-                boxShadow:'0 10px 30px rgba(0,0,0,0.6)',
-                pointerEvents:'none', lineHeight:1.45
-              }}>
-                {desc}
+          {desc && desc.trim() !== '' && (
+            <div
+              ref={iconRef}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={() => setShowTip(false)}
+              style={{ position:'relative', cursor:'default', display:'flex', alignItems:'center' }}
+            >
+              <span style={{
+                display:'flex', alignItems:'center', justifyContent:'center',
+                width:16, height:16, borderRadius:'50%',
+                border:'1px solid rgba(255,255,255,0.22)', fontSize:10,
+                color:'rgba(255,255,255,0.4)', fontWeight:700,
+                userSelect:'none',
+              }}>i</span>
+              {showTip && (
                 <div style={{
                   position:'absolute', 
-                  ...(tipPos === 'top' ? { top:'100%' } : { bottom:'100%' }),
-                  right:10, width:0, height:0,
-                  borderLeft:'6px solid transparent', borderRight:'6px solid transparent',
-                  [tipPos === 'top' ? 'borderTop' : 'borderBottom']:'6px solid rgba(255,255,255,0.12)',
-                }} />
-              </div>
-            )}
-          </div>
+                  ...(tipPos === 'top' ? { bottom:'calc(100% + 8px)' } : { top:'calc(100% + 8px)' }),
+                  right:-8, width: 220,
+                  background:'rgba(10,14,26,0.97)', border:'1px solid rgba(255,255,255,0.12)',
+                  borderRadius:8, padding:'10px 14px', whiteSpace:'normal', wordBreak:'keep-all',
+                  fontSize:12, color:'rgba(255,255,255,0.85)', zIndex:999,
+                  boxShadow:'0 10px 30px rgba(0,0,0,0.6)',
+                  pointerEvents:'none', lineHeight:1.45
+                }}>
+                  {desc}
+                  <div style={{
+                    position:'absolute', 
+                    ...(tipPos === 'top' ? { top:'100%' } : { bottom:'100%' }),
+                    right:10, width:0, height:0,
+                    borderLeft:'6px solid transparent', borderRight:'6px solid transparent',
+                    [tipPos === 'top' ? 'borderTop' : 'borderBottom']:'6px solid rgba(255,255,255,0.12)',
+                  }} />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       {/* 값 & 미니 그래프 */}
@@ -361,7 +363,87 @@ function fmtNum(v: number, prefix = '') {
 
 export default function ChartPanel({ data }: { data: ProcessedData }) {
   const d = data.data as Record<string, unknown>;
-  const [selectedMetric, setSelectedMetric] = useState<any>(null);
+  const [openWindows, setOpenWindows] = useState<any[]>([]);
+  const [maxZ, setMaxZ] = useState(100000);
+
+  const openWindow = (metric: any) => {
+    if (openWindows.find(w => w.label === metric.label)) {
+      focusWindow(metric.label);
+      return;
+    }
+    const newWin = {
+      ...metric,
+      id: metric.label,
+      x: 300 + openWindows.length * 30,
+      y: 100 + openWindows.length * 30,
+      zIndex: maxZ + 1
+    };
+    setOpenWindows([...openWindows, newWin]);
+    setMaxZ(maxZ + 1);
+  };
+
+  const closeWindow = (label: string) => {
+    setOpenWindows(openWindows.filter(w => w.label !== label));
+  };
+
+  const focusWindow = (label: string) => {
+    setOpenWindows(openWindows.map(w => 
+      w.label === label ? { ...w, zIndex: maxZ + 1 } : w
+    ));
+    setMaxZ(maxZ + 1);
+  };
+
+  const updatePos = (label: string, x: number, y: number) => {
+    setOpenWindows(prev => prev.map(w => 
+      w.label === label ? { ...w, x, y } : w
+    ));
+  };
+
+  // 데이터 처리 로직 메모이제이션 (드래그 시 불필요한 재계산 및 랜덤 데이터 생성 방지)
+  const financialMetricsData = useMemo(() => {
+    if (data.category !== 'financial_metrics') return null;
+    
+    const m = (d.metrics as Record<string,number> | undefined) ?? {};
+    const epsHistory = (d.epsHistory as {year:string;eps:number}[] | undefined) ?? [];
+    const quarterly = (d.quarterlyRevenue as {period:string;revenue:number;operatingProfit:number}[] | undefined) ?? [];
+
+    // 레이더 데이터
+    const radarData = [
+      { metric:'수익성(ROE)', value: Math.min(100, ((m.roe ?? 0) / 30) * 100) },
+      { metric:'효율성(ROA)', value: Math.min(100, ((m.roa ?? 0) / 15) * 100) },
+      { metric:'성장성', value: Math.min(100, Math.max(0, ((m.revenueGrowth ?? 0) + 5) / 35 * 100)) },
+      { metric:'안정성', value: Math.min(100, Math.max(0, 100 - (m.debtRatio ?? 50) * 0.7)) },
+      { metric:'밸류에이션', value: m.peRatio ? Math.min(100, (40 / m.peRatio) * 100) : 0 },
+      { metric:'마진', value: Math.min(100, ((m.operatingMargin ?? 0) / 25) * 100) },
+    ];
+
+    const genSpark = (base: number | undefined, trend: 'up'|'down'|'flat' = 'flat') => {
+      if (base == null) return [];
+      // 고정된 시드나 일관된 규칙 없이 Math.random()을 쓰면 리렌더링마다 데이터가 바뀜
+      // 여기서는 useMemo 덕분에 data가 바뀔 때만 생성됨
+      return Array.from({length: 12}, (_, i) => {
+         let val = base * (1 + (Math.random() - 0.5) * 0.15);
+         if (trend === 'up') val += (i/12) * base * 0.3;
+         if (trend === 'down') val -= (i/12) * base * 0.3;
+         return val;
+      });
+    };
+
+    const metricCards = [
+      { label:'PER', value: m.peRatio?.toFixed(1) ?? '-', unit:'배', desc:'주가가 회사의 1년 순이익의 몇 배인지 나타냅니다. 낮을수록 저평가되어 있습니다.', hint: m.peRatio ? (m.peRatio < 15 ? '저평가' : m.peRatio < 25 ? '적정' : '고평가') : '-', hintColor: m.peRatio ? (m.peRatio < 15 ? '#10b981' : m.peRatio < 25 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.peRatio, m.peRatio && m.peRatio < 15 ? 'down' : 'flat') },
+      { label:'PBR', value: m.pbr?.toFixed(2) ?? '-', unit:'배', desc:'회사의 순자산(가진 돈) 대비 주가가 몇 배인지 나타냅니다. 1 미만이면 회사를 다 팔아도 남는 장사라는 뜻입니다.', hint: m.pbr ? (m.pbr < 1 ? '저평가' : m.pbr < 2 ? '적정' : '고평가') : '-', hintColor: m.pbr ? (m.pbr < 1 ? '#10b981' : m.pbr < 2 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.pbr, 'flat') },
+      { label:'ROE', value: m.roe?.toFixed(1) ?? '-', unit:'%', desc:'주주의 돈(자본)을 굴려서 1년에 몇 %의 수익을 냈는지 보여줍니다. 높을수록 장사를 잘하는 곳입니다.', hint: m.roe ? (m.roe >= 15 ? '우수' : m.roe >= 8 ? '양호' : '주의') : '-', hintColor: m.roe ? (m.roe >= 15 ? '#10b981' : m.roe >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roe, m.roe && m.roe >= 15 ? 'up' : 'flat') },
+      { label:'ROA', value: m.roa?.toFixed(1) ?? '-', unit:'%', desc:'회사가 가진 모든 자산(빚 포함)을 활용해 얼만큼의 수익을 냈는지 보여줍니다.', hint: m.roa ? (m.roa >= 8 ? '우수' : m.roa >= 4 ? '양호' : '주의') : '-', hintColor: m.roa ? (m.roa >= 8 ? '#10b981' : m.roa >= 4 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roa, 'flat') },
+      { label:'영업이익률', value: m.operatingMargin?.toFixed(1) ?? '-', unit:'%', desc:'물건을 팔고 남은 순수한 장사 이윤이 몇 %인지 나타냅니다.', hint: m.operatingMargin ? (m.operatingMargin >= 15 ? '우수' : m.operatingMargin >= 8 ? '양호' : '주의') : '-', hintColor: m.operatingMargin ? (m.operatingMargin >= 15 ? '#10b981' : m.operatingMargin >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.operatingMargin, 'up') },
+      { label:'순이익률', value: m.netMargin?.toFixed(1) ?? '-', unit:'%', desc:'모든 비용과 세금까지 다 떼고 최종적으로 회사 주머니에 남은 수익 비율입니다.', hint: '-', hintColor: '#94a3b8', sparkData: genSpark(m.netMargin, 'up') },
+      { label:'부채비율', value: m.debtRatio?.toFixed(0) ?? '-', unit:'%', desc:'내 돈(자본) 대비 남의 돈(빚)이 얼마나 되는지 나타냅니다. 낮을수록 안전합니다.', hint: m.debtRatio ? (m.debtRatio < 50 ? '안정' : m.debtRatio < 100 ? '양호' : '주의') : '-', hintColor: m.debtRatio ? (m.debtRatio < 50 ? '#10b981' : m.debtRatio < 100 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.debtRatio, m.debtRatio && m.debtRatio > 100 ? 'up' : 'down') },
+      { label:'매출성장률', value: m.revenueGrowth?.toFixed(1) ?? '-', unit:'%', desc:'작년보다 물건을 얼마나 더 많이 팔았는지 나타냅니다.', hint: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '고성장' : m.revenueGrowth >= 0 ? '성장' : '역성장') : '-', hintColor: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '#10b981' : m.revenueGrowth >= 0 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.revenueGrowth, 'flat') },
+      { label:'EPS', value: m.eps ? `₩${(+m.eps).toLocaleString()}` : '-', unit:'', desc:'주식 1주가 1년 동안 벌어들인 순이익입니다. 꾸준히 우상향하는 회사가 좋습니다.', hint: '-', hintColor: '#94a3b8', sparkData: epsHistory.map(h => h.eps) },
+      { label:'배당수익률', value: m.dividendYield?.toFixed(2) ?? '-', unit:'%', desc:'지금 주식 1주를 사면 1년에 배당금으로 몇 %를 받을 수 있는지 나타냅니다.', hint: m.dividendYield ? (m.dividendYield >= 3 ? '고배당' : m.dividendYield >= 1 ? '배당주' : '저배당') : '-', hintColor: '#94a3b8', sparkData: genSpark(m.dividendYield, 'flat') },
+    ];
+
+    return { m, epsHistory, quarterly, radarData, metricCards };
+  }, [data, d]);
 
   switch (data.category) {
     case 'stock': {
@@ -415,44 +497,8 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
 
 
     case 'financial_metrics': {
-      const m = (d.metrics as Record<string,number> | undefined) ?? {};
-      const epsHistory = (d.epsHistory as {year:string;eps:number}[] | undefined) ?? [];
-      const quarterly = (d.quarterlyRevenue as {period:string;revenue:number;operatingProfit:number}[] | undefined) ?? [];
-
-      // 레이더 데이터: 각 지표를 0~100 스코어로 변환
-      const radarData = [
-        { metric:'수익성(ROE)', value: Math.min(100, ((m.roe ?? 0) / 30) * 100) },
-        { metric:'효율성(ROA)', value: Math.min(100, ((m.roa ?? 0) / 15) * 100) },
-        { metric:'성장성', value: Math.min(100, Math.max(0, ((m.revenueGrowth ?? 0) + 5) / 35 * 100)) },
-        { metric:'안정성', value: Math.min(100, Math.max(0, 100 - (m.debtRatio ?? 50) * 0.7)) },
-        { metric:'밸류에이션', value: m.peRatio ? Math.min(100, (40 / m.peRatio) * 100) : 0 },
-        { metric:'마진', value: Math.min(100, ((m.operatingMargin ?? 0) / 25) * 100) },
-      ];
-
-      // 가상의 미니 스파크라인 데이터 생성기
-      const genSpark = (base: number | undefined, trend: 'up'|'down'|'flat' = 'flat') => {
-        if (base == null) return [];
-        return Array.from({length: 12}, (_, i) => {
-           let val = base * (1 + (Math.random() - 0.5) * 0.15);
-           if (trend === 'up') val += (i/12) * base * 0.3;
-           if (trend === 'down') val -= (i/12) * base * 0.3;
-           return val;
-        });
-      };
-
-      // 지표 카드 정의 (값, 설명, 좋은/나쁜 기준)
-      const metricCards = [
-        { label:'PER', value: m.peRatio?.toFixed(1) ?? '-', unit:'배', desc:'주가가 회사의 1년 순이익의 몇 배인지 나타냅니다. 낮을수록 저평가되어 있습니다.', hint: m.peRatio ? (m.peRatio < 15 ? '저평가' : m.peRatio < 25 ? '적정' : '고평가') : '-', hintColor: m.peRatio ? (m.peRatio < 15 ? '#10b981' : m.peRatio < 25 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.peRatio, m.peRatio && m.peRatio < 15 ? 'down' : 'flat') },
-        { label:'PBR', value: m.pbr?.toFixed(2) ?? '-', unit:'배', desc:'회사의 순자산(가진 돈) 대비 주가가 몇 배인지 나타냅니다. 1 미만이면 회사를 다 팔아도 남는 장사라는 뜻입니다.', hint: m.pbr ? (m.pbr < 1 ? '저평가' : m.pbr < 2 ? '적정' : '고평가') : '-', hintColor: m.pbr ? (m.pbr < 1 ? '#10b981' : m.pbr < 2 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.pbr, 'flat') },
-        { label:'ROE', value: m.roe?.toFixed(1) ?? '-', unit:'%', desc:'주주의 돈(자본)을 굴려서 1년에 몇 %의 수익을 냈는지 보여줍니다. 높을수록 장사를 잘하는 곳입니다.', hint: m.roe ? (m.roe >= 15 ? '우수' : m.roe >= 8 ? '양호' : '주의') : '-', hintColor: m.roe ? (m.roe >= 15 ? '#10b981' : m.roe >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roe, m.roe && m.roe >= 15 ? 'up' : 'flat') },
-        { label:'ROA', value: m.roa?.toFixed(1) ?? '-', unit:'%', desc:'회사가 가진 모든 자산(빚 포함)을 활용해 얼만큼의 수익을 냈는지 보여줍니다.', hint: m.roa ? (m.roa >= 8 ? '우수' : m.roa >= 4 ? '양호' : '주의') : '-', hintColor: m.roa ? (m.roa >= 8 ? '#10b981' : m.roa >= 4 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roa, 'flat') },
-        { label:'영업이익률', value: m.operatingMargin?.toFixed(1) ?? '-', unit:'%', desc:'물건을 팔고 남은 순수한 장사 이윤이 몇 %인지 나타냅니다.', hint: m.operatingMargin ? (m.operatingMargin >= 15 ? '우수' : m.operatingMargin >= 8 ? '양호' : '주의') : '-', hintColor: m.operatingMargin ? (m.operatingMargin >= 15 ? '#10b981' : m.operatingMargin >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.operatingMargin, 'up') },
-        { label:'순이익률', value: m.netMargin?.toFixed(1) ?? '-', unit:'%', desc:'모든 비용과 세금까지 다 떼고 최종적으로 회사 주머니에 남은 수익 비율입니다.', hint: '-', hintColor: '#94a3b8', sparkData: genSpark(m.netMargin, 'up') },
-        { label:'부채비율', value: m.debtRatio?.toFixed(0) ?? '-', unit:'%', desc:'내 돈(자본) 대비 남의 돈(빚)이 얼마나 되는지 나타냅니다. 낮을수록 안전합니다.', hint: m.debtRatio ? (m.debtRatio < 50 ? '안정' : m.debtRatio < 100 ? '양호' : '주의') : '-', hintColor: m.debtRatio ? (m.debtRatio < 50 ? '#10b981' : m.debtRatio < 100 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.debtRatio, m.debtRatio && m.debtRatio > 100 ? 'up' : 'down') },
-        { label:'매출성장률', value: m.revenueGrowth?.toFixed(1) ?? '-', unit:'%', desc:'작년보다 물건을 얼마나 더 많이 팔았는지 나타냅니다.', hint: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '고성장' : m.revenueGrowth >= 0 ? '성장' : '역성장') : '-', hintColor: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '#10b981' : m.revenueGrowth >= 0 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.revenueGrowth, 'flat') },
-        { label:'EPS', value: m.eps ? `₩${(+m.eps).toLocaleString()}` : '-', unit:'', desc:'주식 1주가 1년 동안 벌어들인 순이익입니다. 꾸준히 우상향하는 회사가 좋습니다.', hint: '-', hintColor: '#94a3b8', sparkData: epsHistory.map(h => h.eps) },
-        { label:'배당수익률', value: m.dividendYield?.toFixed(2) ?? '-', unit:'%', desc:'지금 주식 1주를 사면 1년에 배당금으로 몇 %를 받을 수 있는지 나타냅니다.', hint: m.dividendYield ? (m.dividendYield >= 3 ? '고배당' : m.dividendYield >= 1 ? '배당주' : '저배당') : '-', hintColor: '#94a3b8', sparkData: genSpark(m.dividendYield, 'flat') },
-      ];
+      if (!financialMetricsData) return null;
+      const { m, epsHistory, quarterly, radarData, metricCards } = financialMetricsData;
 
       return (
         <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
@@ -463,7 +509,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               {metricCards.map((c, i) => (
                 <MetricCard key={i} {...c} onClick={() => {
                   if (c.sparkData && c.sparkData.length > 0) {
-                    setSelectedMetric(c);
+                    openWindow(c);
                   }
                 }} />
               ))}
@@ -522,56 +568,16 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
             </div>
           )}
 
-          {/* 팝업 모달 (핵심 재무 지표 클릭 시) */}
-          {selectedMetric && (
-            <div style={{
-              position:'fixed', top:0, left:0, right:0, bottom:0,
-              background:'rgba(0,0,0,0.75)', zIndex:99999,
-              display:'flex', alignItems:'center', justifyContent:'center',
-              backdropFilter:'blur(5px)'
-            }} onClick={() => setSelectedMetric(null)}>
-              <div style={{
-                width: 480, background:'rgba(15,23,42,0.95)', border:'1px solid rgba(255,255,255,0.15)',
-                borderRadius:16, padding:24, boxShadow:'0 20px 40px rgba(0,0,0,0.7)',
-                position: 'relative'
-              }} onClick={e => e.stopPropagation()}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
-                  <div>
-                    <h3 style={{ fontSize:20, fontWeight:800, color:'white', marginBottom:6 }}>
-                      {selectedMetric.label} 추이
-                      <span style={{ fontSize:14, fontWeight:700, color:selectedMetric.hintColor !== '#94a3b8' && selectedMetric.hintColor !== '-' ? selectedMetric.hintColor : 'white', marginLeft: 12 }}>
-                        {selectedMetric.value}{selectedMetric.unit}
-                      </span>
-                    </h3>
-                    <p style={{ fontSize:12, color:'rgba(255,255,255,0.5)', lineHeight:1.4, wordBreak:'keep-all' }}>{selectedMetric.desc}</p>
-                  </div>
-                  <button onClick={() => setSelectedMetric(null)} style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.5)', cursor:'pointer', fontSize:20, padding:4, marginTop:-4 }}>✕</button>
-                </div>
-                
-                <div style={{ height: 220, width: '100%', marginTop:24 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={selectedMetric.sparkData.map((val:any, idx:number) => ({ val, period: `M-${idx+1}` }))} margin={{ top:5, right:5, bottom:0, left:-20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                      <XAxis dataKey="period" tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
-                      <Tooltip 
-                        contentStyle={{ background:'rgba(10,14,26,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize: 12 }}
-                        formatter={(v:number) => [v.toFixed(2), selectedMetric.label]}
-                        labelStyle={{ color:'rgba(255,255,255,0.5)', marginBottom:4 }}
-                      />
-                      <Area 
-                        type="monotone" dataKey="val" 
-                        stroke={selectedMetric.hintColor !== '#94a3b8' && selectedMetric.hintColor !== '-' ? selectedMetric.hintColor : '#8b5cf6'} 
-                        fill={selectedMetric.hintColor !== '#94a3b8' && selectedMetric.hintColor !== '-' ? selectedMetric.hintColor : '#8b5cf6'} 
-                        fillOpacity={0.25} strokeWidth={3} 
-                        activeDot={{ r: 5, strokeWidth: 0 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </div>
-          )}
+          {/* 이동 가능한 윈도우들 */}
+          {openWindows.map(win => (
+            <DraggableMetricWindow 
+              key={win.id} 
+              win={win} 
+              onClose={() => closeWindow(win.id)}
+              onFocus={() => focusWindow(win.id)}
+              onMove={(x,y) => updatePos(win.id, x, y)}
+            />
+          ))}
         </div>
       );
     }
@@ -828,7 +834,337 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
       );
     }
 
+    case 'dynamic': {
+      const blocks = (d.blocks as any[]) ?? [];
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '24px' }}>
+          {blocks.map((block, i) => (
+            <DynamicBlock key={block.id || i} block={block} openWindow={openWindow} />
+          ))}
+          
+          {/* 이동 가능한 윈도우들 (동적 분석 모드에서도 지원) */}
+          {openWindows.map(win => (
+            <DraggableMetricWindow 
+              key={win.id} 
+              win={win} 
+              onClose={() => closeWindow(win.id)}
+              onFocus={() => focusWindow(win.id)}
+              onMove={(x,y) => updatePos(win.id, x, y)}
+            />
+          ))}
+        </div>
+      );
+    }
+
     default:
-      return <p style={{ color: 'var(--text-secondary)' }}>이 카테고리의 차트를 준비 중입니다.</p>;
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>
+            <span>ℹ️</span>
+            <span>이 데이터에 최적화된 전용 차트가 아직 준비되지 않아 상세 표 형태로 표시합니다.</span>
+          </div>
+          <TableView data={d} />
+        </div>
+      );
   }
+}
+
+// ─── 이동 가능한 윈도우 컴포넌트 ───────────────────────────────────
+function DraggableMetricWindow({ win, onClose, onFocus, onMove }: { 
+  win: any, onClose: () => void, onFocus: () => void, onMove: (x:number, y:number) => void 
+}) {
+  const isDragging = useRef(false);
+  const startPos = useRef({ x:0, y:0 });
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    onFocus();
+    isDragging.current = true;
+    startPos.current = { x: e.clientX - win.x, y: e.clientY - win.y };
+    
+    const handleMouseMove = (em: MouseEvent) => {
+      if (isDragging.current) {
+        onMove(em.clientX - startPos.current.x, em.clientY - startPos.current.y);
+      }
+    };
+    
+    const handleMouseUp = () => {
+      isDragging.current = false;
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
+
+  return (
+    <div 
+      style={{
+        position:'fixed', left: win.x, top: win.y, zIndex: win.zIndex,
+        width: 440, background:'rgba(15,23,42,0.92)', border:'1px solid rgba(255,255,255,0.15)',
+        borderRadius:16, padding:20, boxShadow:'0 10px 30px rgba(0,0,0,0.5)',
+        backdropFilter:'blur(10px)', pointerEvents:'auto'
+      }}
+      onMouseDown={onFocus}
+    >
+      <div 
+        onMouseDown={onMouseDown}
+        style={{ 
+          display:'flex', justifyContent:'space-between', alignItems:'flex-start', 
+          marginBottom:16, cursor:'move', paddingBottom:10, borderBottom:'1px solid rgba(255,255,255,0.05)' 
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize:18, fontWeight:800, color:'white', marginBottom:4 }}>
+            {win.label} 추이
+            <span style={{ fontSize:14, fontWeight:700, color:win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : 'white', marginLeft: 10 }}>
+              {win.value}{win.unit}
+            </span>
+          </h3>
+          <p style={{ fontSize:11, color:'rgba(255,255,255,0.4)', lineHeight:1.3, maxWidth:340 }}>{win.desc}</p>
+        </div>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClose(); }} 
+          style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:18, padding:4 }}
+        >✕</button>
+      </div>
+      
+      <div style={{ height: 180, width: '100%', marginTop:10 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart data={win.sparkData.map((val:any, idx:number) => ({ val, period: `M-${idx+1}` }))} margin={{ top:5, right:5, bottom:0, left:-20 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <XAxis dataKey="period" tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+            <Tooltip 
+              contentStyle={{ background:'rgba(10,14,26,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize: 11 }}
+              formatter={(v:number) => [v.toFixed(2), win.label]}
+            />
+            <Area 
+              type="monotone" dataKey="val" 
+              stroke={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : '#8b5cf6'} 
+              fill={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : '#8b5cf6'} 
+              fillOpacity={0.2} strokeWidth={2.5} 
+              activeDot={{ r: 4, strokeWidth: 0 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+
+// ─── 동적 대시보드 블록 렌더러 ─────────────────────────────────────
+function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) => void }) {
+  const colSpan = block.layout === 'full' ? 'span 6' : block.layout === 'half' ? 'span 3' : 'span 2';
+  
+  return (
+    <div style={{
+      gridColumn: colSpan,
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: '16px',
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '16px'
+    }}>
+      {block.title && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{block.title}</h3>
+          {block.description && (
+             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{block.description}</div>
+          )}
+        </div>
+      )}
+      
+      <div style={{ flex: 1, minHeight: '100px' }}>
+        {renderBlockContent(block, openWindow)}
+      </div>
+    </div>
+  );
+}
+
+function renderBlockContent(block: any, openWindow: (m: any) => void) {
+  const tooltipStyle = {
+    background: 'rgba(10, 14, 26, 0.95)',
+    border: '1px solid rgba(255,255,255,0.15)',
+    borderRadius: '10px',
+    color: '#fff',
+    fontSize: '12px',
+  };
+
+  switch (block.type) {
+    case 'metrics':
+      return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '10px' }}>
+          {block.data.map((m: any, i: number) => (
+            <MetricCard 
+              key={i} 
+              label={m.label} 
+              value={m.value} 
+              unit={m.unit} 
+              hint={m.change || '-'} 
+              hintColor={m.changeColor || '#94a3b8'} 
+              desc={m.desc || ''} 
+              sparkData={m.sparkData}
+              onClick={() => m.sparkData ? openWindow(m) : undefined}
+            />
+          ))}
+        </div>
+      );
+
+    case 'chart':
+      const chartType = block.config?.chartType || 'line';
+      let xKey = block.config?.xAxisKey || 'date';
+      let yKey = block.config?.yAxisKey || 'value';
+      let nameKey = block.config?.nameKey || 'name';
+      let valueKey = block.config?.valueKey || 'value';
+      
+      // Auto-detect keys if they don't match the data
+      if (block.data && block.data.length > 0) {
+        const dataKeys = Object.keys(block.data[0]);
+        if (!dataKeys.includes(xKey)) {
+          xKey = dataKeys.find(k => typeof block.data[0][k] === 'string') || dataKeys[0];
+        }
+        if (!dataKeys.includes(yKey)) {
+          yKey = dataKeys.find(k => typeof block.data[0][k] === 'number') || dataKeys[dataKeys.length > 1 ? 1 : 0];
+        }
+        if (!dataKeys.includes(nameKey)) nameKey = xKey;
+        if (!dataKeys.includes(valueKey)) valueKey = yKey;
+      }
+      
+      return (
+        <ResponsiveContainer width="100%" height={220}>
+          {chartType === 'line' ? (
+            <LineChart data={block.data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Line type="monotone" dataKey={yKey} stroke="#6366f1" strokeWidth={2} dot={false} />
+            </LineChart>
+          ) : chartType === 'bar' ? (
+            <BarChart data={block.data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Bar dataKey={yKey} fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          ) : chartType === 'pie' ? (
+            <PieChart>
+              <Pie 
+                data={block.data} 
+                dataKey={valueKey} 
+                nameKey={nameKey} 
+                cx="50%" 
+                cy="50%" 
+                outerRadius={80} 
+                innerRadius={50}
+                label={({[nameKey]: n, [valueKey]: v}) => `${n} (${v}%)`}
+                labelLine={false}
+              >
+                {block.data.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+              </Pie>
+              <Tooltip contentStyle={tooltipStyle} />
+            </PieChart>
+          ) : (
+            <AreaChart data={block.data}>
+               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+               <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
+               <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+               <Tooltip contentStyle={tooltipStyle} />
+               <Area type="monotone" dataKey={yKey} stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
+            </AreaChart>
+          )}
+        </ResponsiveContainer>
+      );
+
+    case 'radar':
+      return (
+        <ResponsiveContainer width="100%" height={220}>
+          <RadarChart data={block.data}>
+            <PolarGrid stroke="rgba(255,255,255,0.07)" />
+            <PolarAngleAxis dataKey="metric" tick={{ fill:'#94a3b8', fontSize:10 }} />
+            <Radar name="Score" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+            <Tooltip contentStyle={tooltipStyle} />
+          </RadarChart>
+        </ResponsiveContainer>
+      );
+
+    case 'ranking':
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {block.data.map((item: any, i: number) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{i+1}</div>
+              <div style={{ flex: 1, fontSize: '13px', fontWeight: 600 }}>{item.name}</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#6366f1' }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+      );
+
+    case 'table':
+      return <TableView data={block.data} />;
+
+    default:
+      return (
+        <div style={{ padding: '20px', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>
+          지원하지 않는 시각화 조각입니다.
+        </div>
+      );
+  }
+}
+
+function TableView({ data }: { data: any }) {
+  if (!data) return null;
+
+  // Case 1: Array of objects (Standard table)
+  if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
+    const keys = Object.keys(data[0]);
+    return (
+      <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+          <thead>
+            <tr style={{ background: 'rgba(255,255,255,0.05)', textAlign: 'left' }}>
+              {keys.map(k => (
+                <th key={k} style={{ padding: '12px 16px', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>{k}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((row, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                {keys.map(k => (
+                  <td key={k} style={{ padding: '12px 16px' }}>
+                    {typeof row[k] === 'object' ? JSON.stringify(row[k]) : String(row[k])}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
+  // Case 2: Simple object (Key-Value table)
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    const entries = Object.entries(data).filter(([_, v]) => typeof v !== 'object' || v === null);
+    if (entries.length === 0) return <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>표시할 데이터가 없습니다.</div>;
+    
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '8px' }}>
+        {entries.map(([k, v]) => (
+          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.04)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>{k}</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{String(v)}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>지원하지 않는 데이터 형식입니다.</div>;
 }

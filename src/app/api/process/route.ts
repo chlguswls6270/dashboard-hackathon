@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getSkillsContent, buildSystemPrompt, buildUserPrompt } from '@/lib/prompts';
 
+let cachedSkills: string | null = null;
+// We'll move the actual caching logic to getSkillsContent in lib/prompts.ts instead of here
+// to keep it cleaner.
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -24,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     const skillsContent = getSkillsContent();
     const systemPrompt = buildSystemPrompt(skillsContent);
@@ -36,15 +40,35 @@ export async function POST(req: NextRequest) {
     ]);
 
     const responseText = result.response.text().trim();
+    console.log('[/api/process] AI Response Length:', responseText.length);
 
-    // Strip markdown code blocks if present
-    const cleaned = responseText
-      .replace(/^```json\s*/i, '')
-      .replace(/^```\s*/i, '')
-      .replace(/\s*```$/i, '')
-      .trim();
+    // More robust JSON extraction: Find the first { and the last }
+    const firstBrace = responseText.indexOf('{');
+    const lastBrace = responseText.lastIndexOf('}');
+    
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+      console.error('[/api/process] Invalid AI Response:', responseText);
+      throw new Error('AI가 유효한 JSON 형식을 반환하지 않았습니다.');
+    }
+    
+    const cleaned = responseText.substring(firstBrace, lastBrace + 1);
 
     const parsed = JSON.parse(cleaned);
+
+    // --- Enhanced Data Merging ---
+    // If AI returns visualization fields (like holdings, priceHistory) at root level,
+    // move them into the 'data' object where ChartPanel expects them.
+    const systemFields = ['category', 'categoryKo', 'title', 'chartType', 'subChartType', 'summary', 'insights', 'riskLevel', 'timeRange', 'metadata', 'data'];
+    const dataObj = parsed.data && typeof parsed.data === 'object' ? { ...parsed.data } : {};
+    
+    Object.keys(parsed).forEach(key => {
+      if (!systemFields.includes(key)) {
+        dataObj[key] = parsed[key];
+      }
+    });
+    parsed.data = dataObj;
+    // ----------------------------
+
     parsed.metadata = parsed.metadata ?? {};
     parsed.metadata.processedAt = new Date().toISOString();
     parsed.metadata.dataSource = filename ?? 'upload';

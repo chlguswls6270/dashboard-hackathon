@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { Upload, Loader2, FileJson, FileText, Database, TrendingUp, Search, Zap, Layers, PieChart, BarChart2, Activity } from 'lucide-react';
+import { Upload, Loader2, FileJson, FileText, Database, TrendingUp, Search, Zap, Layers, PieChart, BarChart2, Activity, Type } from 'lucide-react';
 
 interface UploadPanelProps {
   onProcess: (file: File | null, dummyKey?: string) => Promise<void>;
@@ -15,7 +15,21 @@ interface UploadPanelProps {
 export default function UploadPanel({ onProcess, processing, processingName, error }: UploadPanelProps) {
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [inputType, setInputType] = useState<'file' | 'text'>('file');
+  const [textInput, setTextInput] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleProcessClick = () => {
+    if (processing) return;
+    if (inputType === 'file' && selectedFile) {
+      onProcess(selectedFile);
+    } else if (inputType === 'text' && textInput.trim().length > 0) {
+      const textFile = new File([textInput], "pasted_data.txt", { type: "text/plain" });
+      onProcess(textFile);
+    }
+  };
+
+  const isReady = (inputType === 'file' && selectedFile !== null) || (inputType === 'text' && textInput.trim().length > 0);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -125,93 +139,137 @@ export default function UploadPanel({ onProcess, processing, processingName, err
         display: 'flex', flexDirection: 'column', gap: '24px',
         boxShadow: '0 24px 64px rgba(0,0,0,0.4)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Database size={20} style={{ color: '#6366f1' }} />
-          <h3 style={{ fontWeight: 700, fontSize: '17px' }}>파일 업로드</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '-8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Database size={20} style={{ color: '#6366f1' }} />
+            <h3 style={{ fontWeight: 700, fontSize: '17px' }}>데이터 입력</h3>
+          </div>
+          
+          <div style={{ display: 'flex', background: 'rgba(0,0,0,0.3)', borderRadius: '10px', padding: '4px' }}>
+            <button 
+              onClick={() => setInputType('file')}
+              style={{ padding: '6px 12px', borderRadius: '8px', border: 'none', background: inputType === 'file' ? 'rgba(99,102,241,0.2)' : 'transparent', color: inputType === 'file' ? '#818cf8' : 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+            >
+              <Upload size={14} /> 파일 업로드
+            </button>
+            <button 
+              onClick={() => setInputType('text')}
+              style={{ padding: '6px 12px', borderRadius: '8px', border: 'none', background: inputType === 'text' ? 'rgba(99,102,241,0.2)' : 'transparent', color: inputType === 'text' ? '#818cf8' : 'rgba(255,255,255,0.4)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s' }}
+            >
+              <Type size={14} /> 텍스트 입력
+            </button>
+          </div>
         </div>
 
-        {/* Dropzone */}
-        <div
-          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-          onDragLeave={() => setDragOver(false)}
-          onDrop={handleDrop}
-          onClick={() => fileRef.current?.click()}
-          style={{
-            border: `2px dashed ${dragOver ? '#6366f1' : 'rgba(255,255,255,0.15)'}`,
-            background: dragOver ? 'rgba(99,102,241,0.05)' : 'rgba(255,255,255,0.02)',
-            borderRadius: '16px',
-            padding: '50px 40px',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', transition: 'all 0.2s',
-            flex: 1, minHeight: '340px',
-          }}
-          onMouseEnter={e => {
-            if (!dragOver) {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-            }
-          }}
-          onMouseLeave={e => {
-            if (!dragOver) {
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
-              e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-            }
-          }}
-        >
-          <input
-            ref={fileRef}
-            type="file"
-            accept=".json,.csv,.txt"
-            className="hidden"
-            onChange={e => setSelectedFile(e.target.files?.[0] ?? null)}
-          />
-          
-          {selectedFile ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '64px', height: '64px', borderRadius: '16px',
-                background: 'rgba(99,102,241,0.15)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                {selectedFile.name.endsWith('.json') 
-                  ? <FileJson size={32} style={{ color: '#818cf8' }} /> 
-                  : <FileText size={32} style={{ color: '#818cf8' }} />
-                }
+        {/* Input Area */}
+        {inputType === 'file' ? (
+          <div
+            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            onDrop={handleDrop}
+            onClick={() => fileRef.current?.click()}
+            style={{
+              border: `2px dashed ${dragOver ? '#6366f1' : 'rgba(255,255,255,0.15)'}`,
+              background: dragOver ? 'rgba(99,102,241,0.05)' : 'rgba(255,255,255,0.02)',
+              borderRadius: '16px',
+              padding: '50px 40px',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', transition: 'all 0.2s',
+              flex: 1, minHeight: '340px',
+            }}
+            onMouseEnter={e => {
+              if (!dragOver) {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              }
+            }}
+            onMouseLeave={e => {
+              if (!dragOver) {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+              }
+            }}
+          >
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".json,.csv,.tsv,.txt"
+              className="hidden"
+              onChange={e => setSelectedFile(e.target.files?.[0] ?? null)}
+            />
+            
+            {selectedFile ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '64px', height: '64px', borderRadius: '16px',
+                  background: 'rgba(99,102,241,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  {selectedFile.name.endsWith('.json') 
+                    ? <FileJson size={32} style={{ color: '#818cf8' }} /> 
+                    : <FileText size={32} style={{ color: '#818cf8' }} />
+                  }
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '18px', fontWeight: 700, color: 'white', marginBottom: '4px' }}>
+                    {selectedFile.name}
+                  </p>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </p>
+                </div>
               </div>
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '18px', fontWeight: 700, color: 'white', marginBottom: '4px' }}>
-                  {selectedFile.name}
-                </p>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-                  {(selectedFile.size / 1024).toFixed(1)} KB
-                </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                <div style={{
+                  width: '72px', height: '72px', borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.05)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <Upload size={32} style={{ color: 'rgba(255,255,255,0.6)' }} />
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
+                    클릭하거나 파일을 드래그하세요
+                  </p>
+                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
+                    지원 포맷: JSON, CSV, TSV, TXT (최대 10MB)
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '72px', height: '72px', borderRadius: '50%',
-                background: 'rgba(255,255,255,0.05)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                <Upload size={32} style={{ color: 'rgba(255,255,255,0.6)' }} />
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontSize: '16px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', marginBottom: '6px' }}>
-                  클릭하거나 파일을 드래그하세요
-                </p>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}>
-                  지원 포맷: JSON, CSV, TXT (최대 10MB)
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '340px' }}>
+            <textarea
+              value={textInput}
+              onChange={e => setTextInput(e.target.value)}
+              placeholder="분석할 텍스트나 표, Raw 데이터를 여기에 직접 붙여넣으세요..."
+              style={{
+                flex: 1,
+                width: '100%',
+                background: 'rgba(255,255,255,0.02)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '16px',
+                padding: '24px',
+                color: 'white',
+                fontSize: '14px',
+                lineHeight: 1.6,
+                resize: 'none',
+                outline: 'none',
+                fontFamily: 'inherit',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={e => e.target.style.borderColor = '#6366f1'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.15)'}
+            />
+          </div>
+        )}
 
         {/* Action Button */}
-        {selectedFile && (
+        {isReady && (
           <button
-            onClick={() => !processing && onProcess(selectedFile)}
+            onClick={handleProcessClick}
             disabled={processing}
             style={{
               marginTop: '8px',

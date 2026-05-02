@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { CATEGORY_META, type CategoryKey, type ProcessedData, type AlertItem } from '@/lib/types';
-import { saveToCache, loadAllFromCache, clearCache } from '@/lib/cache';
+import { saveToCache, loadAllFromCache, clearCache, deleteFromCache } from '@/lib/cache';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import UploadPanel from '@/components/UploadPanel';
@@ -12,6 +12,7 @@ import HomeDashboard from '@/components/HomeDashboard';
 import LoginOverlay from '@/components/LoginOverlay';
 import MyPageDashboard from '@/components/MyPageDashboard';
 import PortfolioFeedPage from '@/components/PortfolioFeedPage';
+import UploadedDataDashboard from '@/components/UploadedDataDashboard';
 
 export default function DashboardPage() {
   const [cachedData, setCachedData] = useState<ProcessedData[]>([]);
@@ -136,24 +137,27 @@ export default function DashboardPage() {
         setActiveItem(null);
       } else if (file) {
         setProcessingName(file.name);
-        const text = await file.text();
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('filename', file.name);
+
         const res = await fetch('/api/process', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rawData: text, fileName: file.name }),
+          body: formData,
         });
         const result = await res.json();
         if (result.error) throw new Error(result.error);
         
         // Handle single item upload
-        const item = result.data;
+        const item = result;
         // Use a generated id if not present
         if (!item.id) item.id = `${item.category}_${Date.now()}`;
+        if (!item.data) item.data = {};
         item.data.isUserUploaded = true;
         
         await saveToCache(item);
         await refreshCache();
-        setActiveTab(item.category);
+        setActiveTab('uploaded');
         setActiveItem(item);
       }
     } catch (err: any) {
@@ -168,6 +172,14 @@ export default function DashboardPage() {
     setActiveTab('home');
     setActiveItem(null);
   }, []);
+
+  const handleDeleteItem = async (id: string) => {
+    await deleteFromCache(id);
+    await refreshCache();
+    if (activeItem?.id === id) {
+      setActiveItem(null);
+    }
+  };
 
   const handleSelectTab = async (tab: string) => {
     setActiveTab(tab);
@@ -192,7 +204,7 @@ export default function DashboardPage() {
   };
 
   const handleSelectItem = (item: ProcessedData) => {
-    setActiveTab(item.category);
+    // Do not change activeTab here, so the back button returns to the previous context
     setActiveItem(item);
     
     // Track recent views
@@ -251,6 +263,12 @@ export default function DashboardPage() {
               processingName={processingName}
               error={error}
               onClose={() => setActiveTab('home')}
+            />
+          ) : activeTab === 'uploaded' && !activeItem ? (
+            <UploadedDataDashboard
+              items={cachedData.filter((item: any) => item.data?.isUserUploaded === true)}
+              onSelectItem={handleSelectItem}
+              onDeleteItem={handleDeleteItem}
             />
           ) : activeTab === 'home' ? (
             <HomeDashboard 

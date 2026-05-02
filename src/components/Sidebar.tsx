@@ -11,7 +11,7 @@ interface SidebarProps {
   onClearCache: () => void;
 }
 
-const ALL_CATEGORIES = Object.keys(CATEGORY_META) as CategoryKey[];
+const ALL_CATEGORIES = Object.keys(CATEGORY_META).filter(c => c !== 'dynamic') as CategoryKey[];
 
 export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCache }: SidebarProps) {
   const categoryCounts = cachedData.reduce((acc, item) => {
@@ -49,6 +49,13 @@ export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCac
           >
             <Download size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
             <span className="flex-1 font-medium">데이터 불러오기</span>
+          </button>
+          <button
+            onClick={() => onSelectTab('uploaded')}
+            className={`tab-item w-full text-left transition-all ${activeTab === 'uploaded' ? 'active' : ''}`}
+          >
+            <BarChart2 size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
+            <span className="flex-1 font-medium">내가 올린 데이터</span>
           </button>
         </div>
 

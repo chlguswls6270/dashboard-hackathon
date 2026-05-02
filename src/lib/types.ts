@@ -2,13 +2,29 @@ export type CategoryKey =
   | 'stock' | 'etf' | 'portfolio' | 'financial_metrics'
   | 'market_indicators' | 'bonds' | 'commodities' | 'forex'
   | 'crypto' | 'macro' | 'trade' | 'dividend'
-  | 'derivatives' | 'funds' | 'reits';
+  | 'derivatives' | 'funds' | 'reits' | 'dynamic';
 
 export type ChartType =
   | 'candlestick' | 'line' | 'bar' | 'pie' | 'donut'
   | 'area' | 'scatter' | 'radar' | 'heatmap' | 'histogram';
 
 export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface VisualBlock {
+  id: string;
+  type: 'metrics' | 'chart' | 'radar' | 'insights' | 'table' | 'news' | 'ranking';
+  title: string;
+  description?: string;
+  layout: 'full' | 'half' | 'third';
+  data: any;
+  config?: {
+    chartType?: ChartType;
+    colors?: string[];
+    showLegend?: boolean;
+    xAxisKey?: string;
+    yAxisKey?: string;
+  };
+}
 
 export interface ProcessedData {
   id: string;
@@ -21,7 +37,7 @@ export interface ProcessedData {
   insights: string[];
   riskLevel: RiskLevel;
   timeRange: string;
-  data: Record<string, unknown>;
+  data: Record<string, unknown> | { blocks: VisualBlock[] };
   metadata: {
     rowCount: number;
     currency: string;
@@ -46,6 +62,7 @@ export const CATEGORY_META: Record<CategoryKey, { ko: string; icon: string; colo
   derivatives:        { ko: '파생상품',   icon: '⚡', color: '#f43f5e' },
   funds:              { ko: '펀드',       icon: '📋', color: '#0ea5e9' },
   reits:              { ko: '리츠',       icon: '🏢', color: '#22c55e' },
+  dynamic:            { ko: 'AI 종합 분석', icon: '✨', color: '#f472b6' },
 };
 
 export interface AlertItem {
