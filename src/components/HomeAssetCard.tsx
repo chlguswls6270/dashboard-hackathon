@@ -10,8 +10,8 @@ interface HomeAssetCardProps {
 }
 
 export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
-  const hist = item.data.priceHistory || item.data.history || item.data.yieldHistory || item.data.navHistory;
-
+  const d = item.data as any;
+  const hist = d.priceHistory || d.history || d.yieldHistory || d.navHistory || d.dividendHistory || d.optionChain || [];
   let chartData: number[] = [];
   let chartDates: string[] = [];
 

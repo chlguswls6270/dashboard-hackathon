@@ -117,8 +117,8 @@ export default function ETFPriceChart({ priceHistory }: { priceHistory: PricePoi
           />
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={(v: number) => [`₩${v.toLocaleString()}`, '가격']}
-            labelFormatter={fmtDate}
+            formatter={(v: any) => [`₩${v.toLocaleString()}`, '가격']}
+            labelFormatter={(d: any) => fmtDate(d as string)}
           />
           <Area
             type="monotone"

@@ -4,7 +4,7 @@ import { CATEGORY_META, type ProcessedData } from '@/lib/types';
 import { CAT_ICONS } from '@/lib/icons';
 import { ChevronRight, ArrowLeft, Clock, Database, Search, User } from 'lucide-react';
 
-export default function Header({ activeData, onBack, userName, onUserClick }: { activeData: ProcessedData | null, onBack?: () => void, userName?: string | null, onUserClick?: () => void }) {
+export default function Header({ activeData, onBack, userName, onUserClick, searchQuery, onSearch }: { activeData: ProcessedData | null, onBack?: () => void, userName?: string | null, onUserClick?: () => void, searchQuery?: string, onSearch?: (query: string) => void }) {
   return (
     <header className="flex items-center justify-between px-6 border-b gap-6" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', padding: '16px 28px' }}>
       {activeData ? (
@@ -38,7 +38,9 @@ export default function Header({ activeData, onBack, userName, onUserClick }: { 
           </div>
           <input
             type="text"
-            placeholder="심볼, 애널리스트, 키워드 검색... (준비 중)"
+            placeholder="심볼, 애널리스트, 키워드 검색..."
+            value={searchQuery ?? ''}
+            onChange={(e) => onSearch?.(e.target.value)}
             style={{
               width: '100%',
               background: 'rgba(0,0,0,0.25)',

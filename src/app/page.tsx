@@ -13,11 +13,13 @@ import LoginOverlay from '@/components/LoginOverlay';
 import MyPageDashboard from '@/components/MyPageDashboard';
 import PortfolioFeedPage from '@/components/PortfolioFeedPage';
 import UploadedDataDashboard from '@/components/UploadedDataDashboard';
+import SearchResultsDashboard from '@/components/SearchResultsDashboard';
 
 export default function DashboardPage() {
   const [cachedData, setCachedData] = useState<ProcessedData[]>([]);
   const [activeTab, setActiveTab] = useState<string>('home');
   const [activeItem, setActiveItem] = useState<ProcessedData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [processing, setProcessing] = useState(false);
   const [processingName, setProcessingName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -95,24 +97,20 @@ export default function DashboardPage() {
   // Load all cached items on mount
   useEffect(() => {
     refreshCache().then(async () => {
-      const items = await loadAllFromCache();
-      if (items.length === 0) {
-        setProcessing(true);
-        try {
-          const res = await fetch('/api/dummy/all');
-          const result = await res.json();
-          if (result.items) {
-            // Save all items to cache
-            for (const item of result.items) {
-              await saveToCache(item);
-            }
-            await refreshCache();
+      setProcessing(true);
+      try {
+        const res = await fetch('/api/dummy/all');
+        const result = await res.json();
+        if (result.items) {
+          for (const item of result.items) {
+            await saveToCache(item);
           }
-        } catch (err) {
-          console.error("Failed to auto-load dummy data", err);
-        } finally {
-          setProcessing(false);
+          await refreshCache();
         }
+      } catch (err) {
+        console.error("Failed to auto-load dummy data", err);
+      } finally {
+        setProcessing(false);
       }
     });
   }, []);
@@ -222,6 +220,15 @@ export default function DashboardPage() {
   const activeCategory = Object.keys(CATEGORY_META).includes(activeTab) ? activeTab as CategoryKey : null;
   const activeCategoryItems = activeCategory ? cachedData.filter(d => d.category === activeCategory) : [];
 
+  const searchResults = searchQuery.trim() ? cachedData.filter(item => {
+    const q = searchQuery.toLowerCase();
+    const title = item.title?.toLowerCase() || '';
+    const summary = item.summary?.toLowerCase() || '';
+    const ticker = (item.data as any)?.ticker?.toLowerCase() || (item.data as any)?.symbol?.toLowerCase() || '';
+    const categoryKo = item.categoryKo?.toLowerCase() || '';
+    return title.includes(q) || summary.includes(q) || ticker.includes(q) || categoryKo.includes(q);
+  }) : [];
+
   return (
     <div className="flex h-screen overflow-hidden bg-grid" style={{ background: 'var(--bg-primary)' }}>
       {isClient && !userName && <LoginOverlay onLogin={handleLogin} />}
@@ -241,10 +248,23 @@ export default function DashboardPage() {
           onBack={activeItem ? handleBackToSummary : undefined}
           userName={userName}
           onUserClick={() => { setActiveTab('mypage'); setActiveItem(null); }}
+          searchQuery={searchQuery}
+          onSearch={(q) => {
+            setSearchQuery(q);
+            if (q && activeItem) {
+              setActiveItem(null);
+            }
+          }}
         />
 
         <main className="flex-1 overflow-auto" style={{ padding: '40px 48px' }}>
-          {activeTab === 'mypage' && userName ? (
+          {searchQuery && !activeItem ? (
+            <SearchResultsDashboard
+              items={searchResults}
+              onSelectItem={handleSelectItem}
+              query={searchQuery}
+            />
+          ) : activeTab === 'mypage' && userName ? (
             <MyPageDashboard 
               userName={userName}
               cachedData={cachedData}
@@ -270,7 +290,7 @@ export default function DashboardPage() {
               onSelectItem={handleSelectItem}
               onDeleteItem={handleDeleteItem}
             />
-          ) : activeTab === 'home' ? (
+          ) : activeTab === 'home' && !activeItem ? (
             <HomeDashboard 
               cachedData={cachedData} 
               onSelectTab={handleSelectTab} 

@@ -288,8 +288,8 @@ export default function StockChart({ history }: { history: OHLC[] }) {
             />
             <Tooltip
               contentStyle={tooltipStyle}
-              formatter={(v: number) => [`₩${v.toLocaleString()}`, '종가']}
-              labelFormatter={fmtDate}
+              formatter={(v: any) => [`₩${v.toLocaleString()}`, '종가']}
+              labelFormatter={(d: any) => fmtDate(d as string)}
             />
             <Area
               type="monotone"

@@ -56,7 +56,8 @@ function getCategoryKo(cat: CategoryKey) {
     financial_metrics: '재무 지표', market_indicators: '시장 지표',
     bonds: '채권', commodities: '원자재', forex: '외환',
     crypto: '암호화폐', macro: '경제 지표', trade: '거래 내역',
-    dividend: '배당', derivatives: '파생상품', funds: '펀드', reits: '리츠'
+    dividend: '배당', derivatives: '파생상품', funds: '펀드', reits: '리츠',
+    dynamic: '동적 데이터'
   };
   return map[cat] || cat;
 }
@@ -67,7 +68,8 @@ function getChartType(cat: CategoryKey) {
     financial_metrics: 'radar', market_indicators: 'line',
     bonds: 'line', commodities: 'line', forex: 'line',
     crypto: 'line', macro: 'line', trade: 'bar',
-    dividend: 'bar', derivatives: 'scatter', funds: 'area', reits: 'bar'
+    dividend: 'bar', derivatives: 'scatter', funds: 'area', reits: 'bar',
+    dynamic: 'line'
   };
   return map[cat] || 'line';
 }

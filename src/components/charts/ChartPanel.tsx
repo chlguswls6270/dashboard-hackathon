@@ -125,8 +125,8 @@ function PortfolioDetailChart({
             />
             <Tooltip
               contentStyle={pfTooltipStyle}
-              formatter={(v:number, n:string) => [fmtPfMoney(v), n]}
-              labelFormatter={fmtPfDate}
+              formatter={(v: any, n: any) => [fmtPfMoney(v as number), n as string]}
+              labelFormatter={(d: any) => fmtPfDate(d as string)}
             />
             <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
             <Line type="monotone" dataKey="value" stroke={lineColor} strokeWidth={2.5} dot={false} name="포트폴리오" />
@@ -136,16 +136,16 @@ function PortfolioDetailChart({
       </div>
 
       {/* ── 자산 배분 도넛 + 종목별 수익률 바 ── */}
-      <div className="grid grid-cols-2 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
         <div>
           <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>자산 배분</p>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie data={alloc} dataKey="weight" nameKey="category" cx="50%" cy="50%" innerRadius={55} outerRadius={90}
-                label={({category,weight}) => `${category} ${weight}%`} labelLine={false}>
+                label={(props: any) => `${props.category} ${props.weight}%`} labelLine={false}>
                 {alloc.map((a,i) => <Cell key={i} fill={ALLOC_COLORS[a.category] ?? `hsl(${i*40},70%,55%)`} />)}
               </Pie>
-              <Tooltip contentStyle={pfTooltipStyle} formatter={(v:number) => [`${v}%`, '비중']} />
+              <Tooltip contentStyle={pfTooltipStyle} formatter={(v: any) => [`${v}%`, '비중']} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -156,7 +156,7 @@ function PortfolioDetailChart({
               <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
               <XAxis type="number" tick={{ fill:'#475569', fontSize:10 }} tickFormatter={v=>`${v}%`} />
               <YAxis dataKey="asset" type="category" tick={{ fill:'#94a3b8', fontSize:10 }} width={90} />
-              <Tooltip contentStyle={pfTooltipStyle} formatter={(v:number) => [`${v > 0 ? '+' : ''}${v}%`, '수익률']} cursor={false} />
+              <Tooltip contentStyle={pfTooltipStyle} formatter={(v: any) => [`${v > 0 ? '+' : ''}${v}%`, '수익률']} cursor={false} />
               <Bar dataKey="returnRate" isAnimationActive={false} activeBar={false}
                 shape={(props:any) => (
                   <rect x={props.x} y={props.y} width={Math.abs(props.width)} height={props.height}
@@ -321,7 +321,7 @@ function HoldingsBarChart({ holdings, tooltipStyle }: { holdings: {name:string;w
         <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
         <XAxis type="number" tick={{ fill:'#475569', fontSize:11 }} />
         <YAxis dataKey="name" type="category" tick={{ fill:'#94a3b8', fontSize:11 }} width={100} />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v}%`, '비중']} cursor={false} />
+        <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`, '비중']} cursor={false} />
         <Bar
           dataKey="weight"
           fill="#8b5cf6"
@@ -362,7 +362,7 @@ function fmtNum(v: number, prefix = '') {
 }
 
 export default function ChartPanel({ data }: { data: ProcessedData }) {
-  const d = data.data as Record<string, unknown>;
+  const d = data.data as any;
   const [openWindows, setOpenWindows] = useState<any[]>([]);
   const [maxZ, setMaxZ] = useState(100000);
 
@@ -459,15 +459,15 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {/* 섹터 비중 + 보유 종목 */}
           {(sectors.length > 0 || holdings.length > 0) && (
-            <div className="grid grid-cols-2 gap-6 items-center">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24, alignItems: 'center' }}>
               <div>
                 <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>섹터 비중</p>
                 <ResponsiveContainer width="100%" height={280}>
                   <PieChart>
-                    <Pie data={sectors} dataKey="weight" nameKey="sector" cx="50%" cy="50%" outerRadius={100} label={({sector,weight})=>`${sector} ${weight}%`} labelLine={false}>
+                    <Pie data={sectors} dataKey="weight" nameKey="sector" cx="50%" cy="50%" outerRadius={100} label={(props: any)=>`${props.sector} ${props.weight}%`} labelLine={false}>
                       {sectors.map((_,i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
-                    <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v}%`, '비중']} />
+                    <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`, '비중']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -517,7 +517,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
           </div>
 
           {/* 레이더 + EPS 추이 */}
-          <div className="grid grid-cols-2 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
             <div>
               <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>재무 역량 레이더</p>
               <ResponsiveContainer width="100%" height={280}>
@@ -526,7 +526,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <PolarAngleAxis dataKey="metric" tick={{ fill:'#94a3b8', fontSize:10 }} />
                   <PolarRadiusAxis angle={30} domain={[0,100]} tick={{ fill:'#475569', fontSize:9 }} />
                   <Radar name="재무지표" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v.toFixed(0)}점`, '스코어']} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v.toFixed(0)}점`, '스코어']} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -537,7 +537,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis dataKey="year" tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`₩${(v/1000).toFixed(0)}k`} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`₩${v.toLocaleString()}`, 'EPS']} cursor={false} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v.toLocaleString()}`, 'EPS']} cursor={false} />
                   <Bar dataKey="eps" fill="#8b5cf6" radius={[6,6,0,0]} isAnimationActive={false} activeBar={false}
                     shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#8b5cf6" rx={6} />}
                   />
@@ -555,7 +555,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis dataKey="period" tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`${(v/1e6).toFixed(0)}M`} />
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v:number, n:string) => [`₩${v.toLocaleString()}`, n==='revenue'?'매출':'영업이익']} cursor={false} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any, n: any) => [`₩${v.toLocaleString()}`, n==='revenue'?'매출':'영업이익']} cursor={false} />
                   <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
                   <Bar dataKey="revenue" fill="#6366f1" radius={[4,4,0,0]} name="매출" isAnimationActive={false} activeBar={false}
                     shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#6366f1" rx={4} />}
@@ -586,40 +586,89 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     case 'market_indicators': {
       const history = ((d.history as {date:string;value:number}[] | undefined) ?? []).slice(-90);
       const sectors = (d.sectorPerformance as {sector:string;changePercent:number}[] | undefined) ?? [];
+      const breadth = (d.breadth as {advancing?:number;declining?:number;unchanged?:number} | undefined) ?? {};
+      const addl = (d.additionalIndicators as Record<string,number> | undefined) ?? {};
+      const breadthTotal = (breadth.advancing ?? 0) + (breadth.declining ?? 0) + (breadth.unchanged ?? 0);
       return (
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>지수 추이 (90일)</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <AreaChart data={history}>
-                <defs>
-                  <linearGradient id="mktGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#mktGrad)" strokeWidth={2} dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>섹터별 등락률</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={sectors} layout="vertical">
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
-                <XAxis type="number" tick={{ fill:'#475569', fontSize:11 }} tickFormatter={v=>`${v}%`} />
-                <YAxis dataKey="sector" type="category" tick={{ fill:'#94a3b8', fontSize:11 }} width={60} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v}%`,'등락률']} />
-                <Bar dataKey="changePercent" radius={[0,4,4,0]}>
-                  {sectors.map((s,i) => <Cell key={i} fill={s.changePercent >= 0 ? '#10b981' : '#ef4444'} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          {(history.length > 0 || sectors.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: history.length > 0 && sectors.length > 0 ? '1fr 1fr' : '1fr', gap: 24 }}>
+              {history.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>지수 추이 (90일)</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <AreaChart data={history}>
+                      <defs>
+                        <linearGradient id="mktGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                      <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                      <Tooltip contentStyle={tooltipStyle} />
+                      <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#mktGrad)" strokeWidth={2} dot={false} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              {sectors.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>섹터별 등락률</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={sectors} layout="vertical" margin={{ left: 0, right: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
+                      <XAxis type="number" tick={{ fill:'#475569', fontSize:11 }} tickFormatter={v=>`${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis dataKey="sector" type="category" tick={{ fill:'#94a3b8', fontSize:11 }} width={72} />
+                      <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v > 0 ? '+' : ''}${v}%`,'등락률']} />
+                      <Bar dataKey="changePercent" radius={[0,4,4,0]} maxBarSize={20}>
+                        {sectors.map((s,i) => <Cell key={i} fill={s.changePercent >= 0 ? '#10b981' : '#ef4444'} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          )}
+          {(breadthTotal > 0 || addl.fearGreedIndex != null) && (
+            <div style={{ display: 'grid', gridTemplateColumns: breadthTotal > 0 && addl.fearGreedIndex != null ? '1fr 1fr' : '1fr', gap: 16 }}>
+              {breadthTotal > 0 && (
+                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: '20px 24px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 14, letterSpacing: '0.05em' }}>시장 폭 (Market Breadth)</p>
+                  <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', marginBottom: 10 }}>
+                    <div style={{ width: `${((breadth.advancing ?? 0)/breadthTotal)*100}%`, background: '#10b981', transition: 'width 0.5s' }} />
+                    <div style={{ width: `${((breadth.unchanged ?? 0)/breadthTotal)*100}%`, background: '#475569' }} />
+                    <div style={{ width: `${((breadth.declining ?? 0)/breadthTotal)*100}%`, background: '#ef4444' }} />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
+                    <span style={{ color: '#10b981', fontWeight: 700 }}>↑ 상승 {breadth.advancing ?? '-'}종목</span>
+                    <span>변동없음 {breadth.unchanged ?? '-'}</span>
+                    <span style={{ color: '#ef4444', fontWeight: 700 }}>↓ 하락 {breadth.declining ?? '-'}종목</span>
+                  </div>
+                </div>
+              )}
+              {addl.fearGreedIndex != null && (() => {
+                const fg = addl.fearGreedIndex;
+                const fgColor = fg < 25 ? '#ef4444' : fg < 45 ? '#f59e0b' : fg < 55 ? '#94a3b8' : fg < 75 ? '#10b981' : '#06b6d4';
+                const fgLabel = fg < 25 ? '극도의 공포' : fg < 45 ? '공포' : fg < 55 ? '중립' : fg < 75 ? '탐욕' : '극도의 탐욕';
+                return (
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: '20px 24px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 14, letterSpacing: '0.05em' }}>공포·탐욕 지수 (Fear & Greed)</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+                      <div style={{ width: 72, height: 72, borderRadius: '50%', border: `4px solid ${fgColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <span style={{ fontSize: 22, fontWeight: 800, color: fgColor }}>{fg}</span>
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 16, fontWeight: 700, color: fgColor, marginBottom: 4 }}>{fgLabel}</p>
+                        {addl.putCallRatio != null && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Put/Call Ratio: <strong style={{color:'rgba(255,255,255,0.7)'}}>{addl.putCallRatio}</strong></p>}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
         </div>
       );
     }
@@ -627,32 +676,57 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     case 'bonds': {
       const curve = (d.yieldCurve as {maturity:string;yield:number}[] | undefined) ?? [];
       const hist = ((d.yieldHistory as {date:string;yield:number}[] | undefined) ?? []).slice(-90);
+      const metrics = [
+        { label: '표면금리', value: (d as any).couponRate?.toFixed(2) ?? '-', unit: '%', desc: '채권의 이자율입니다.' },
+        { label: '현재수익률', value: (d as any).currentYield?.toFixed(2) ?? '-', unit: '%', desc: '현재 가격 대비 이자 수익률입니다.' },
+        { label: '만기수익률(YTM)', value: (d as any).yieldToMaturity?.toFixed(2) ?? '-', unit: '%', desc: '만기까지 보유했을 때의 연평균 수익률입니다.', sparkData: hist.map(h => h.yield) },
+        { label: '듀레이션', value: (d as any).duration?.toFixed(2) ?? '-', unit: '년', desc: '금리 변화에 대한 가격 민감도입니다.' },
+      ];
       return (
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 곡선</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={curve}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                <XAxis dataKey="maturity" tick={{ fill:'#475569', fontSize:11 }} />
-                <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v}%`,'금리']} />
-                <Line type="monotone" dataKey="yield" stroke="#84cc16" strokeWidth={2} dot={{ fill:'#84cc16', r:4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 추이</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={hist}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} domain={['auto','auto']} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Line type="monotone" dataKey="yield" stroke="#eab308" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>핵심 채권 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint="-" hintColor="#94a3b8" onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {(curve.length > 0 || hist.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: curve.length > 0 && hist.length > 0 ? '1fr 1fr' : '1fr', gap: 24 }}>
+              {curve.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 곡선</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={curve}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                      <XAxis dataKey="maturity" tick={{ fill:'#475569', fontSize:11 }} />
+                      <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
+                      <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`,'금리']} />
+                      <Line type="monotone" dataKey="yield" stroke="#84cc16" strokeWidth={2} dot={{ fill:'#84cc16', r:4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              {hist.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 추이</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <LineChart data={hist}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                      <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} domain={['auto','auto']} />
+                      <Tooltip contentStyle={tooltipStyle} />
+                      <Line type="monotone" dataKey="yield" stroke="#eab308" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
@@ -664,45 +738,97 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
       const priceKey = data.category === 'forex' ? 'rate' : 'price';
       const color = data.category === 'crypto' ? '#ef4444' : data.category === 'forex' ? '#f97316' : '#eab308';
       const history = ((d[key] as Record<string,number>[] | undefined) ?? []).slice(-90);
+      
+      const metrics = data.category === 'crypto' ? [
+        { label: '현재가', value: d.currentPrice?.toLocaleString() ?? '-', unit: '$', desc: '현재 거래 가격입니다.', sparkData: history.map(h => h.price) },
+        { label: '시가총액', value: d.marketCap ? (d.marketCap/1e9).toFixed(2) : '-', unit: 'B', desc: '총 발행량에 현재가를 곱한 값입니다.' },
+        { label: '24시간 거래량', value: d.volume24h ? (d.volume24h/1e6).toFixed(2) : '-', unit: 'M', desc: '최근 24시간 동안의 거래 규모입니다.' },
+        { label: '24시간 변동률', value: d.change24h?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 가격 변동률입니다.', hint: d.change24h ? (d.change24h > 0 ? '상승' : '하락') : '-', hintColor: d.change24h ? (d.change24h > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+      ] : data.category === 'forex' ? [
+        { label: '현재 환율', value: d.currentRate?.toLocaleString() ?? '-', unit: '', desc: '현재 적용되는 환율입니다.', sparkData: history.map(h => h.rate) },
+        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+        { label: '매수호가(Bid)', value: d.bid?.toLocaleString() ?? '-', unit: '', desc: '시장에서 매수하려는 최고 가격입니다.' },
+        { label: '매도호가(Ask)', value: d.ask?.toLocaleString() ?? '-', unit: '', desc: '시장에서 매도하려는 최저 가격입니다.' },
+      ] : [
+        { label: '현재가', value: d.currentPrice?.toLocaleString() ?? '-', unit: '$', desc: '원자재의 현재 가격입니다.', sparkData: history.map(h => h.price) },
+        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+      ];
+
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>최근 90일 추이</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={history}>
-              <defs>
-                <linearGradient id="genGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={color} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-              <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Area type="monotone" dataKey={priceKey} stroke={color} fill="url(#genGrad)" strokeWidth={2} dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>주요 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint={c.hint ?? '-'} hintColor={c.hintColor ?? "#94a3b8"} onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {history.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>최근 90일 추이</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={history}>
+                  <defs>
+                    <linearGradient id="genGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={color} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={color} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                  <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Area type="monotone" dataKey={priceKey} stroke={color} fill="url(#genGrad)" strokeWidth={2} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
 
     case 'macro': {
       const hist = (d.history as Record<string,number|string>[] | undefined) ?? [];
+      const metrics = [
+        { label: 'GDP성장률', value: d.gdp?.toFixed(2) ?? '-', unit: '%', desc: '국내총생산의 성장률입니다.', sparkData: hist.map(h => h.gdpGrowth as number) },
+        { label: '소비자물가지수(CPI)', value: d.cpi?.toFixed(2) ?? '-', unit: '%', desc: '소비자가 구입하는 상품과 서비스의 가격 변동입니다.', sparkData: hist.map(h => h.cpi as number) },
+        { label: '실업률', value: d.unemploymentRate?.toFixed(2) ?? '-', unit: '%', desc: '경제활동인구 중 실업자의 비율입니다.', sparkData: hist.map(h => h.unemploymentRate as number) },
+        { label: '기준금리', value: d.interestRate?.toFixed(2) ?? '-', unit: '%', desc: '중앙은행이 결정하는 정책 금리입니다.', sparkData: hist.map(h => h.interestRate as number) },
+      ];
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>주요 경제 지표 추이</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={hist}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-              <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
-              <Tooltip contentStyle={tooltipStyle} />
-              <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-              <Line type="monotone" dataKey="gdpGrowth" stroke="#6366f1" strokeWidth={2} dot={false} name="GDP성장률" />
-              <Line type="monotone" dataKey="cpi" stroke="#ef4444" strokeWidth={2} dot={false} name="CPI" />
-              <Line type="monotone" dataKey="unemploymentRate" stroke="#f59e0b" strokeWidth={2} dot={false} name="실업률" />
-            </LineChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>주요 경제 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint="-" hintColor="#94a3b8" onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {hist.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>경제 지표 시계열 추이</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={hist}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
+                  <Line type="monotone" dataKey="gdpGrowth" stroke="#6366f1" strokeWidth={2} dot={false} name="GDP성장률" />
+                  <Line type="monotone" dataKey="cpi" stroke="#ef4444" strokeWidth={2} dot={false} name="CPI" />
+                  <Line type="monotone" dataKey="unemploymentRate" stroke="#f59e0b" strokeWidth={2} dot={false} name="실업률" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
@@ -710,88 +836,161 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     case 'trade': {
       const trades = (d.trades as {date:string;side:string;amount:number;name:string}[] | undefined) ?? [];
       const byDate: Record<string,{buy:number;sell:number}> = {};
+      let totalBuy = 0; let totalSell = 0;
       trades.forEach(t => {
         if (!byDate[t.date]) byDate[t.date] = {buy:0,sell:0};
-        if (t.side==='buy') byDate[t.date].buy += t.amount;
-        else byDate[t.date].sell += t.amount;
+        if (t.side==='buy') { byDate[t.date].buy += t.amount; totalBuy += t.amount; }
+        else { byDate[t.date].sell += t.amount; totalSell += t.amount; }
       });
       const chartData = Object.entries(byDate).slice(-30).map(([date,v]) => ({date,...v}));
+      const metrics = [
+        { label: '총 매수금액', value: (totalBuy/10000).toFixed(0), unit: '만', desc: '기간 내 총 매수 금액입니다.' },
+        { label: '총 매도금액', value: (totalSell/10000).toFixed(0), unit: '만', desc: '기간 내 총 매도 금액입니다.' },
+        { label: '순매수금액', value: ((totalBuy - totalSell)/10000).toFixed(0), unit: '만', desc: '매수 금액에서 매도 금액을 뺀 값입니다.', hint: totalBuy >= totalSell ? '순매수' : '순매도', hintColor: totalBuy >= totalSell ? '#10b981' : '#ef4444' },
+      ];
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>일별 매수/매도 금액</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-              <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>fmtNum(v,'₩')} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v:number,n:string) => [fmtNum(v,'₩'), n==='buy'?'매수':'매도']} />
-              <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-              <Bar dataKey="buy" fill="#10b981" radius={[4,4,0,0]} name="매수" />
-              <Bar dataKey="sell" fill="#ef4444" radius={[4,4,0,0]} name="매도" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {trades.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>거래 요약</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint={c.hint ?? "-"} hintColor={c.hintColor ?? "#94a3b8"} />)}
+              </div>
+            </div>
+          )}
+          {chartData.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>일별 매수/매도 금액</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>fmtNum(v,'₩')} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any,n: any) => [fmtNum(v,'₩'), n==='buy'?'매수':'매도']} />
+                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
+                  <Bar dataKey="buy" fill="#10b981" radius={[4,4,0,0]} name="매수" />
+                  <Bar dataKey="sell" fill="#ef4444" radius={[4,4,0,0]} name="매도" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       );
     }
 
     case 'dividend': {
       const hist = ((d.dividendHistory as {exDate:string;amount:number}[] | undefined) ?? []).slice(-12);
+      const metrics = [
+        { label: '배당수익률', value: d.yield?.toFixed(2) ?? '-', unit: '%', desc: '현재가 대비 연간 배당금 비율입니다.', sparkData: hist.map(h => h.amount) },
+        { label: '주당배당금(DPS)', value: d.dividendPerShare?.toLocaleString() ?? '-', unit: '원', desc: '주식 1주당 지급되는 배당금입니다.' },
+      ];
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>배당금 이력</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={hist}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="exDate" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} />
-              <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`₩${v}`, '배당금']} />
-              <Bar dataKey="amount" fill="#a855f7" radius={[4,4,0,0]} name="배당금" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>배당 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint="-" hintColor="#94a3b8" onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {hist.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>배당금 이력</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={hist}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="exDate" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} />
+                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v}`, '배당금']} />
+                  <Bar dataKey="amount" fill="#a855f7" radius={[4,4,0,0]} name="배당금" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
 
     case 'derivatives': {
       const chain = (d.optionChain as {strike:number;callIV:number;putIV:number;callOI:number;putOI:number}[] | undefined) ?? [];
+      const metrics = [
+        { label: '내재변동성(IV)', value: d.impliedVol?.toFixed(2) ?? '-', unit: '%', desc: '옵션 가격에 내재된 예상 변동성입니다.' },
+        { label: '만기일', value: d.expiry ? new Date(d.expiry).toLocaleDateString() : '-', unit: '', desc: '옵션 계약이 만료되는 날짜입니다.' },
+        { label: '행사가', value: d.strike?.toLocaleString() ?? '-', unit: '', desc: '옵션을 행사할 수 있는 기준 가격입니다.' },
+      ];
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>옵션 내재 변동성 (IV) by 행사가</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chain}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="strike" tick={{ fill:'#475569', fontSize:11 }} />
-              <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v:number,n:string) => [`${v}%`, n]} />
-              <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-              <Line type="monotone" dataKey="callIV" stroke="#10b981" strokeWidth={2} dot={{ r:3 }} name="콜 IV" />
-              <Line type="monotone" dataKey="putIV" stroke="#ef4444" strokeWidth={2} dot={{ r:3 }} name="풋 IV" />
-            </LineChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>파생상품 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint="-" hintColor="#94a3b8" />)}
+              </div>
+            </div>
+          )}
+          {chain.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>옵션 내재 변동성 (IV) by 행사가</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={chain}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="strike" tick={{ fill:'#475569', fontSize:11 }} />
+                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any,n: any) => [`${v}%`, n]} />
+                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
+                  <Line type="monotone" dataKey="callIV" stroke="#10b981" strokeWidth={2} dot={{ r:3 }} name="콜 IV" />
+                  <Line type="monotone" dataKey="putIV" stroke="#ef4444" strokeWidth={2} dot={{ r:3 }} name="풋 IV" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
       );
     }
 
     case 'funds': {
       const navHist = ((d.navHistory as {date:string;nav:number}[] | undefined) ?? []).slice(-90);
+      const metrics = [
+        { label: '순자산가치(NAV)', value: d.nav?.toLocaleString() ?? '-', unit: '원', desc: '펀드의 1주당 순자산가치입니다.', sparkData: navHist.map(h => h.nav) },
+        { label: '총수익률', value: d.totalReturn?.toFixed(2) ?? '-', unit: '%', desc: '설정 이후 또는 특정 기간 동안의 총 수익률입니다.', hint: d.totalReturn ? (d.totalReturn > 0 ? '수익' : '손실') : '-', hintColor: d.totalReturn ? (d.totalReturn > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+      ];
       return (
-        <div>
-          <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>NAV 추이 (90일)</p>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={navHist}>
-              <defs>
-                <linearGradient id="fundGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-              <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-              <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`₩${v.toLocaleString()}`} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`₩${v.toLocaleString()}`, 'NAV']} />
-              <Area type="monotone" dataKey="nav" stroke="#0ea5e9" fill="url(#fundGrad)" strokeWidth={2} dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>펀드 핵심 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint={c.hint ?? "-"} hintColor={c.hintColor ?? "#94a3b8"} onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {navHist.length > 0 && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>NAV 추이 (90일)</p>
+              <ResponsiveContainer width="100%" height={300}>
+                <AreaChart data={navHist}>
+                  <defs>
+                    <linearGradient id="fundGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                  <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`₩${v.toLocaleString()}`} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v.toLocaleString()}`, 'NAV']} />
+                  <Area type="monotone" dataKey="nav" stroke="#0ea5e9" fill="url(#fundGrad)" strokeWidth={2} dot={false} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
@@ -799,41 +998,63 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     case 'reits': {
       const priceHist = ((d.priceHistory as {date:string;price:number}[] | undefined) ?? []).slice(-90);
       const breakdown = (d.propertyBreakdown as {type:string;weight:number}[] | undefined) ?? [];
+      const metrics = [
+        { label: 'FFO', value: d.ffo?.toFixed(2) ?? '-', unit: '', desc: '운영수익(Funds From Operations)으로 리츠의 실제 현금 창출 능력을 의미합니다.' },
+        { label: '배당수익률', value: d.distributionYield?.toFixed(2) ?? '-', unit: '%', desc: '현재 주가 대비 연간 배당 수익률입니다.', sparkData: priceHist.map(h => h.price) },
+      ];
       return (
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>주가 추이</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <AreaChart data={priceHist}>
-                <defs>
-                  <linearGradient id="reitGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Area type="monotone" dataKey="price" stroke="#22c55e" fill="url(#reitGrad)" strokeWidth={2} dot={false} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>자산 유형 구성</p>
-            <ResponsiveContainer width="100%" height={280}>
-              <PieChart>
-                <Pie data={breakdown} dataKey="weight" nameKey="type" cx="50%" cy="50%" outerRadius={100} label={({type,weight})=>`${type} ${weight}%`}>
-                  {breakdown.map((_,i) => <Cell key={i} fill={COLORS[i%COLORS.length]} />)}
-                </Pie>
-                <Tooltip contentStyle={tooltipStyle} formatter={(v:number) => [`${v}%`, '비중']} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+          {metrics.some(m => m.value !== '-') && (
+            <div>
+              <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>리츠 핵심 지표</p>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(160px, 1fr))', gap:10 }}>
+                {metrics.filter(c => c.value !== '-').map((c, i) => <MetricCard key={i} {...c} hint="-" hintColor="#94a3b8" onClick={() => c.sparkData && openWindow(c)} />)}
+              </div>
+            </div>
+          )}
+          {(priceHist.length > 0 || breakdown.length > 0) && (
+            <div style={{ display: 'grid', gridTemplateColumns: priceHist.length > 0 && breakdown.length > 0 ? '1fr 1fr' : '1fr', gap: 24 }}>
+              {priceHist.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>주가 추이</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <AreaChart data={priceHist}>
+                      <defs>
+                        <linearGradient id="reitGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
+                      <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                      <Tooltip contentStyle={tooltipStyle} />
+                      <Area type="monotone" dataKey="price" stroke="#22c55e" fill="url(#reitGrad)" strokeWidth={2} dot={false} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              {breakdown.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>자산 유형 구성</p>
+                  <ResponsiveContainer width="100%" height={280}>
+                    <PieChart>
+                      <Pie data={breakdown} dataKey="weight" nameKey="type" cx="50%" cy="50%" outerRadius={100} label={(props: any)=>`${props.type} ${props.weight}%`}>
+                        {breakdown.map((_,i) => <Cell key={i} fill={COLORS[i%COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`, '비중']} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+          )}
+          {openWindows.map(win => (
+            <DraggableMetricWindow key={win.id} win={win} onClose={() => closeWindow(win.id)} onFocus={() => focusWindow(win.id)} onMove={(x,y) => updatePos(win.id, x, y)} />
+          ))}
         </div>
       );
     }
-
     case 'dynamic': {
       const blocks = (d.blocks as any[]) ?? [];
       return (
@@ -937,7 +1158,7 @@ function DraggableMetricWindow({ win, onClose, onFocus, onMove }: {
             <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
             <Tooltip 
               contentStyle={{ background:'rgba(10,14,26,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize: 11 }}
-              formatter={(v:number) => [v.toFixed(2), win.label]}
+              formatter={(v: any) => [v.toFixed(2), win.label]}
             />
             <Area 
               type="monotone" dataKey="val" 
@@ -1061,7 +1282,7 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
                 cy="50%" 
                 outerRadius={80} 
                 innerRadius={50}
-                label={({[nameKey]: n, [valueKey]: v}) => `${n} (${v}%)`}
+                label={(props: any) => `${props[nameKey]} (${props[valueKey]}%)`}
                 labelLine={false}
               >
                 {block.data.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}

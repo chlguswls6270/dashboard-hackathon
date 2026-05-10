@@ -115,16 +115,31 @@ AI는 반드시 아래 최상위 구조의 JSON만 반환한다.
 ```
 
 ### market_indicators
+**주의: 아래 모든 필드를 반드시 채워야 한다. 특히 `sectorPerformance`(최소 8개 섹터)와 `breadth` 필드는 절대 빠뜨리면 안 된다.**
 ```json
 {
-  "indexName": "string",
-  "currentValue": 0,
-  "change": 0,
-  "changePercent": 0,
-  "vix": 0,
+  "indexName": "KOSPI",
+  "currentValue": 2543.12,
+  "change": -5.83,
+  "changePercent": -0.23,
+  "vix": 18.45,
   "history": [{ "date": "YYYY-MM-DD", "value": 0, "volume": 0 }],
-  "sectorPerformance": [{ "sector": "string", "changePercent": 0 }],
-  "breadth": { "advancing": 0, "declining": 0, "unchanged": 0 }
+  "sectorPerformance": [
+    { "sector": "IT", "changePercent": 1.2 },
+    { "sector": "금융", "changePercent": -0.5 },
+    { "sector": "헬스케어", "changePercent": 0.8 },
+    { "sector": "소비재", "changePercent": -1.1 },
+    { "sector": "에너지", "changePercent": 2.3 },
+    { "sector": "산업재", "changePercent": -0.3 },
+    { "sector": "통신", "changePercent": 0.4 },
+    { "sector": "유틸리티", "changePercent": -0.7 }
+  ],
+  "breadth": { "advancing": 412, "declining": 287, "unchanged": 51 },
+  "additionalIndicators": {
+    "putCallRatio": 0.85,
+    "fearGreedIndex": 55,
+    "marginDebt": 0
+  }
 }
 ```
 

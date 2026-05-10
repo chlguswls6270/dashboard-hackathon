@@ -22,6 +22,7 @@ const CAT_ICONS: Record<CategoryKey, React.ReactNode> = {
   derivatives:       <Zap          size={24} />,
   funds:             <BookOpen     size={24} />,
   reits:             <Warehouse    size={24} />,
+  dynamic:           <Globe        size={24} />,
 };
 
 interface CategorySummaryPageProps {

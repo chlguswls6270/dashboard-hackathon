@@ -116,29 +116,86 @@ for(let i=1; i<=20; i++) {
 
 // 10. Macro (15 items)
 for(let i=1; i<=15; i++) {
+  const baseGdp = 2.0 + Math.random();
+  const baseCpi = 3.0 + Math.random();
+  const baseUnemp = 3.5 + Math.random();
+  const baseInt = 5.0 + Math.random();
   categoryData.macro.push({
-    id: `macro_${i}`, name: `거시경제 지표 ${i}`, country: '글로벌', indicators: { gdpGrowth: 2.5, cpi: 3.0 }
+    id: `macro_${i}`, name: `거시경제 지표 ${i}`, country: '글로벌',
+    gdp: baseGdp, cpi: baseCpi, unemploymentRate: baseUnemp, interestRate: baseInt,
+    history: D.map((date, j) => ({
+      date,
+      gdpGrowth: baseGdp + Math.sin(j/30)*0.5,
+      cpi: baseCpi + Math.cos(j/20)*0.5,
+      unemploymentRate: baseUnemp + Math.sin(j/40)*0.2,
+      interestRate: baseInt + Math.cos(j/50)*0.1
+    }))
   });
 }
 
 // 11. Trade (10 items)
 for(let i=1; i<=10; i++) {
+  const trades = [];
+  for(let j=0; j<30; j++) {
+    const side = Math.random() > 0.5 ? 'buy' : 'sell';
+    trades.push({
+      date: D[Math.floor(Math.random() * D.length)],
+      side,
+      amount: Math.floor(Math.random() * 5000000) + 100000,
+      name: `종목 ${Math.floor(Math.random() * 10) + 1}`
+    });
+  }
+  // Sort trades by date
+  trades.sort((a, b) => a.date.localeCompare(b.date));
   categoryData.trade.push({
-    id: `trade_${i}`, name: `종합계좌 거래내역 ${i}`, account: `ACC-${i}`, summary: { realizedPnL: 1500000 * i }
+    id: `trade_${i}`, name: `종합계좌 거래내역 ${i}`, account: `ACC-${i}`,
+    trades,
+    summary: { realizedPnL: 1500000 * i }
   });
 }
 
 // 12. Dividend (20 items)
 for(let i=1; i<=20; i++) {
+  const yieldVal = 3 + Math.random()*5;
+  const dps = Math.floor(Math.random()*5000) + 500;
   categoryData.dividend.push({
-    id: `div_${i}`, name: `고배당 주식 ${i}`, ticker: `DIV${i}`, currentYield: (3 + Math.random()*5).toFixed(2)
+    id: `div_${i}`, name: `고배당 주식 ${i}`, ticker: `DIV${i}`, 
+    yield: yieldVal, currentYield: yieldVal.toFixed(2), dividendPerShare: dps,
+    dividendHistory: Array.from({length: 12}).map((_, j) => {
+      const d = new Date();
+      d.setMonth(d.getMonth() - (11 - j) * 3); // Quarterly
+      return {
+        exDate: d.toISOString().split('T')[0],
+        amount: dps * (1 + (Math.random() * 0.1 - 0.05))
+      };
+    })
   });
 }
 
 // 13. Derivatives (10 items)
 for(let i=1; i<=10; i++) {
+  const expDate = new Date();
+  expDate.setDate(expDate.getDate() + 30 + i*5);
+  
+  const optionChain = [];
+  const baseStrike = 350 + i;
+  for(let j=-5; j<=5; j++) {
+    const strike = baseStrike + j*5;
+    optionChain.push({
+      strike,
+      callIV: 15 + Math.abs(j)*2 + Math.random(),
+      putIV: 15 + Math.abs(j)*2.2 + Math.random(),
+      callOI: Math.floor(Math.random() * 10000),
+      putOI: Math.floor(Math.random() * 10000)
+    });
+  }
+
   categoryData.derivatives.push({
-    id: `deriv_${i}`, name: `파생상품 KOSPI200 옵션 ${i}`, underlyingPrice: 350 + i
+    id: `deriv_${i}`, name: `파생상품 KOSPI200 옵션 ${i}`, underlyingPrice: baseStrike,
+    impliedVol: 18.5 + Math.random()*5,
+    expiry: expDate.toISOString().split('T')[0],
+    strike: baseStrike,
+    optionChain
   });
 }
 

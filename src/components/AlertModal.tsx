@@ -20,7 +20,7 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
   const selectedItem = cachedData.find(d => d.id === targetItemId);
   let currentValStr = '';
   if (selectedItem) {
-    const v = selectedItem.data.currentPrice || selectedItem.data.currentValue || selectedItem.data.nav || selectedItem.data.currentRate || selectedItem.data.currentYield;
+    const v = (selectedItem.data as any).currentPrice || (selectedItem.data as any).currentValue || (selectedItem.data as any).nav || (selectedItem.data as any).currentRate || (selectedItem.data as any).currentYield;
     if (v !== undefined) {
       currentValStr = `(현재가: ${v.toLocaleString()})`;
     }
@@ -81,7 +81,7 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
             >
               {cachedData.map(d => (
                 <option key={d.id} value={d.id}>
-                  [{d.categoryKo}] {d.title} {d.data.ticker ? `(${d.data.ticker})` : ''}
+                  [{d.categoryKo}] {d.title} {(d.data as any).ticker ? `(${(d.data as any).ticker})` : ''}
                 </option>
               ))}
             </select>
