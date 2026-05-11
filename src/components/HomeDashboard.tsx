@@ -73,9 +73,9 @@ const TOTAL_PAGES = ALL_NEWS.length / ITEMS_PER_PAGE; // = 4
 // ── Shared sub-components ─────────────────────────────────────
 
 const cardSectionStyle: React.CSSProperties = {
-  background: 'rgba(20, 27, 45, 0.85)',
-  backdropFilter: 'blur(20px)',
-  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'var(--bg-card)',
+  
+  border: '1px solid var(--border)',
   borderRadius: '20px',
   padding: '24px 28px',
   display: 'flex',
@@ -91,9 +91,9 @@ function PageButtons({ page, total, onChange }: { page: number; total: number; o
           onClick={() => onChange(p)}
           style={{
             width: '28px', height: '28px', borderRadius: '8px',
-            border: page === p ? '1px solid #6366f1' : '1px solid rgba(255,255,255,0.1)',
-            background: page === p ? 'rgba(99,102,241,0.25)' : 'transparent',
-            color: page === p ? '#a5b4fc' : 'rgba(255,255,255,0.4)',
+            border: page === p ? '1px solid rgba(0,208,124,0.5)' : '1px solid var(--border)',
+            background: page === p ? 'rgba(0,208,124,0.12)' : 'transparent',
+            color: page === p ? '#008F55' : 'var(--text-muted)',
             fontSize: '12px', fontWeight: 700, cursor: 'pointer',
             transition: 'all 0.18s',
           }}
@@ -105,7 +105,7 @@ function PageButtons({ page, total, onChange }: { page: number; total: number; o
   );
 }
 
-function ListItem({ rank, onClick, children }: { rank: number; onClick: () => void; children: React.ReactNode }) {
+function ListItem({ rank, onClick, children }: { rank: number; onClick: React.MouseEventHandler<HTMLButtonElement>; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
@@ -115,14 +115,14 @@ function ListItem({ rank, onClick, children }: { rank: number; onClick: () => vo
         background: 'transparent', border: 'none', cursor: 'pointer',
         transition: 'background 0.18s', width: '100%',
       }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-secondary)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
       <div style={{
         width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        background: 'rgba(255,255,255,0.07)',
-        fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.45)',
+        background: 'var(--bg-secondary)',
+        fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)',
       }}>
         {rank}
       </div>
@@ -178,7 +178,7 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
         <h2 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '6px' }} className="gradient-text">
           투데이 인사이트
         </h2>
-        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
+        <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
           시장의 핵심 동향과 주요 지표를 한눈에 파악하세요
         </p>
       </div>
@@ -189,15 +189,15 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
       {/* ── Hot Assets Carousel ── */}
       <section>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-          <TrendingUp size={20} style={{ color: '#6366f1' }} />
+          <TrendingUp size={20} style={{ color: 'var(--accent)' }} />
           <h3 style={{ fontWeight: 700, fontSize: '17px' }}>주요 시장 지표</h3>
         </div>
 
         {hotItems.length > 0 ? (
           <div style={{ position: 'relative' }}>
             <button onClick={() => scroll('left')} style={navBtnStyle('left')}
-              onMouseEnter={e => (e.currentTarget.style.background = '#6366f1')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(20,27,45,0.95)')}>
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent)')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#FFFFFF')}>
               <ChevronLeft size={18} />
             </button>
 
@@ -216,21 +216,21 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
             </div>
 
             <button onClick={() => scroll('right')} style={navBtnStyle('right')}
-              onMouseEnter={e => (e.currentTarget.style.background = '#6366f1')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(20,27,45,0.95)')}>
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--accent)')}
+              onMouseLeave={e => (e.currentTarget.style.background = '#FFFFFF')}>
               <ChevronRight size={18} />
             </button>
           </div>
         ) : (
           <div style={{
-            padding: '48px 24px', border: '1px dashed rgba(255,255,255,0.12)',
+            padding: '48px 24px', border: '1px dashed var(--border-light)',
             borderRadius: '16px', textAlign: 'center',
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
           }}>
-            <AlertCircle style={{ color: 'rgba(255,255,255,0.3)' }} size={28} />
-            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>아직 캐시된 데이터가 없습니다.</p>
+            <AlertCircle style={{ color: 'var(--text-muted)' }} size={28} />
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>아직 캐시된 데이터가 없습니다.</p>
             <button onClick={() => onSelectTab('upload')} style={{
-              background: '#6366f1', color: 'white', border: 'none', borderRadius: '10px',
+              background: 'var(--accent)', color: 'var(--text-primary)', border: 'none', borderRadius: '10px',
               padding: '10px 24px', fontSize: '13px', fontWeight: 600, cursor: 'pointer',
             }}>
               데이터 불러오기
@@ -255,9 +255,9 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
             {pagedAnalysis.map((item, i) => (
               <ListItem key={item.id} rank={(analysisPage - 1) * ITEMS_PER_PAGE + i + 1} onClick={handleMockClick}>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>{item.title}</p>
-                  <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', alignItems: 'center' }}>
-                    <span style={{ background: 'rgba(255,255,255,0.07)', borderRadius: '4px', padding: '1px 6px' }}>{item.type}</span>
+                  <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: 'var(--text-primary)', lineHeight: 1.4 }}>{item.title}</p>
+                  <div style={{ display: 'flex', gap: '8px', fontSize: '11px', color: 'var(--text-muted)', alignItems: 'center' }}>
+                    <span style={{ background: 'var(--bg-secondary)', borderRadius: '4px', padding: '1px 6px' }}>{item.type}</span>
                     <span>{item.author}</span>
                   </div>
                 </div>
@@ -279,8 +279,8 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
             {pagedNews.map((item, i) => (
               <ListItem key={item.id} rank={(newsPage - 1) * ITEMS_PER_PAGE + i + 1} onClick={handleMockClick}>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: 'rgba(255,255,255,0.9)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
-                  <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', alignItems: 'center' }}>
+                  <p style={{ fontSize: '13px', fontWeight: 600, marginBottom: '4px', color: 'var(--text-primary)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</p>
+                  <div style={{ display: 'flex', gap: '6px', fontSize: '11px', color: 'var(--text-muted)', alignItems: 'center' }}>
                     <span>{item.source}</span>
                     <span>·</span>
                     <span>{item.time}</span>
@@ -299,13 +299,13 @@ export default function HomeDashboard({ cachedData, onSelectItem, onSelectTab }:
       {showMockAlert && (
         <div className="animate-fade-up" style={{
           position: 'fixed', bottom: '40px', left: '50%', transform: 'translateX(-50%)',
-          zIndex: 50, background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255,255,255,0.2)', padding: '14px 24px',
-          borderRadius: '100px', boxShadow: '0 16px 48px rgba(0,0,0,0.4)',
+          zIndex: 50, background: 'var(--bg-secondary)', backdropFilter: 'blur(16px)',
+          border: '1px solid var(--border)', padding: '14px 24px',
+          borderRadius: '100px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           display: 'flex', alignItems: 'center', gap: '10px',
         }}>
           <AlertCircle style={{ color: '#fbbf24', flexShrink: 0 }} size={18} />
-          <span style={{ fontSize: '14px', fontWeight: 500, color: 'white' }}>아직은 모의 데이터만 넣어놨습니다. (해커톤 시연용 화면입니다)</span>
+          <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>아직은 모의 데이터만 넣어놨습니다. (해커톤 시연용 화면입니다)</span>
         </div>
       )}
     </div>
@@ -316,9 +316,9 @@ function navBtnStyle(side: 'left' | 'right'): React.CSSProperties {
   return {
     position: 'absolute', [side]: '-18px', top: '50%', transform: 'translateY(-50%)',
     zIndex: 10, width: '36px', height: '36px', borderRadius: '50%',
-    background: 'rgba(20,27,45,0.95)', border: '1px solid rgba(255,255,255,0.12)',
+    background: 'var(--bg-secondary)', border: '1px solid var(--border-light)',
     display: 'flex', alignItems: 'center', justifyContent: 'center',
-    cursor: 'pointer', color: 'white', boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+    cursor: 'pointer', color: 'var(--text-primary)', boxShadow: 'var(--shadow-card)',
     transition: 'background 0.2s',
   };
 }
@@ -346,17 +346,20 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
   // Pull real stocks from cache
   const realStocks = cachedData
     .filter(d => d.category === 'stock')
-    .map(d => ({
-      id: d.id,
-      name: d.title,
-      ticker: d.data.ticker || d.data.symbol || '-',
-      price: `₩${(d.data.currentPrice ?? 0).toLocaleString()}`,
-      change: d.data.changePercent ?? 0,
-      volume: d.data.volume ? `${(d.data.volume / 1_000_000).toFixed(1)}M` : '-',
-      cap: '-',
-      sector: d.categoryKo,
-      _item: d,
-    }));
+    .map(d => {
+      const data = d.data as any;
+      return {
+        id: d.id,
+        name: d.title,
+        ticker: data.ticker || data.symbol || '-',
+        price: `₩${(data.currentPrice ?? 0).toLocaleString()}`,
+        change: data.changePercent ?? 0,
+        volume: data.volume ? `${(data.volume / 1_000_000).toFixed(1)}M` : '-',
+        cap: '-',
+        sector: d.categoryKo,
+        _item: d,
+      };
+    });
 
   const source = realStocks.length >= 5 ? realStocks : MOCK_HOT_STOCKS.map(s => ({ ...s, _item: null as any }));
 
@@ -374,9 +377,9 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
 
   return (
     <section style={{
-      background: 'rgba(20,27,45,0.85)',
-      backdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255,255,255,0.08)',
+      background: 'var(--bg-card)',
+      
+      border: '1px solid var(--border)',
       borderRadius: '20px',
       padding: '28px',
     }}>
@@ -385,7 +388,7 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Flame size={18} style={{ color: '#f97316' }} />
           <h3 style={{ fontWeight: 800, fontSize: '17px' }}>오늘의 핫 종목</h3>
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', paddingLeft: '4px' }}>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', paddingLeft: '4px' }}>
             {realStocks.length >= 5 ? '실시간 캐시 데이터' : '모의 데이터'}
           </span>
         </div>
@@ -395,10 +398,9 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
             <button key={t.key} onClick={() => setTab(t.key)} style={{
               display: 'flex', alignItems: 'center', gap: '5px',
               padding: '6px 14px', borderRadius: '10px', fontSize: '12px', fontWeight: 700,
-              border: tab === t.key ? '1px solid rgba(99,102,241,0.6)' : '1px solid rgba(255,255,255,0.1)',
-              background: tab === t.key ? 'rgba(99,102,241,0.2)' : 'transparent',
-              color: tab === t.key ? '#a5b4fc' : 'rgba(255,255,255,0.5)',
-              cursor: 'pointer', transition: 'all 0.18s',
+              border: tab === t.key ? '1px solid rgba(0,208,124,0.5)' : '1px solid var(--border)',
+              background: tab === t.key ? 'rgba(0,208,124,0.12)' : 'transparent',
+              color: tab === t.key ? '#008F55' : 'var(--text-muted)',              cursor: 'pointer', transition: 'all 0.18s',
             }}>
               {t.icon}
               {t.label}
@@ -413,8 +415,8 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
         gridTemplateColumns: '36px 1fr 90px 90px 80px 80px',
         gap: '8px',
         padding: '0 12px 10px',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 600, letterSpacing: '0.04em',
+        borderBottom: '1px solid var(--border)',
+        fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, letterSpacing: '0.04em',
       }}>
         <span>#</span>
         <span>종목</span>
@@ -428,7 +430,7 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
         {sorted.map((stock, i) => {
           const isPos = stock.change >= 0;
-          const col   = isPos ? '#10b981' : '#ef4444';
+          const col   = isPos ? 'var(--success)' : 'var(--danger)';
           return (
             <button
               key={stock.id}
@@ -447,25 +449,25 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
                 transition: 'background 0.18s',
                 width: '100%',
               }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-secondary)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             >
               {/* Rank */}
-              <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.3)' }}>{i + 1}</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)' }}>{i + 1}</span>
 
               {/* Name + ticker */}
               <div style={{ minWidth: 0 }}>
-                <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.92)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {stock.name}
                 </p>
                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>{stock.ticker}</span>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', padding: '0 4px' }}>{stock.sector}</span>
+                  <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>{stock.ticker}</span>
+                  <span style={{ fontSize: '10px', color: 'var(--border-light)', background: 'var(--bg-secondary)', borderRadius: '4px', padding: '0 4px' }}>{stock.sector}</span>
                 </div>
               </div>
 
               {/* Price */}
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', textAlign: 'right', fontFamily: 'monospace' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', textAlign: 'right', fontFamily: 'monospace' }}>
                 {stock.price}
               </span>
 
@@ -475,10 +477,10 @@ function HotStocksSection({ cachedData, onSelectItem }: { cachedData: ProcessedD
               </span>
 
               {/* Volume */}
-              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', textAlign: 'right' }}>{stock.volume}</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'right' }}>{stock.volume}</span>
 
               {/* Market Cap */}
-              <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)', textAlign: 'right' }}>{stock.cap}</span>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)', textAlign: 'right' }}>{stock.cap}</span>
             </button>
           );
         })}

@@ -2,10 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getSkillsContent, buildSystemPrompt, buildUserPrompt } from '@/lib/prompts';
 
-let cachedSkills: string | null = null;
-// We'll move the actual caching logic to getSkillsContent in lib/prompts.ts instead of here
-// to keep it cleaner.
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();

@@ -24,18 +24,18 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
       const dt = new Date(raw);
       return isNaN(dt.getTime()) ? raw : dt.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
     });
-  } else if (item.data.totalValue && item.data.returnRate !== undefined) {
-    chartData = Array.from({ length: 30 }, (_, i) => item.data.totalValue * (1 + (i - 15) * 0.01));
+  } else if (d.totalValue && d.returnRate !== undefined) {
+    chartData = Array.from({ length: 30 }, (_, i) => d.totalValue * (1 + (i - 15) * 0.01));
   }
 
-  const currentVal = item.data.currentPrice || item.data.currentValue || item.data.currentYield || item.data.currentRate || item.data.nav || item.data.totalValue;
-  const changePct  = item.data.changePercent || item.data.change24h || item.data.returnRate;
+  const currentVal = d.currentPrice || d.currentValue || d.currentYield || d.currentRate || d.nav || d.totalValue;
+  const changePct  = d.changePercent || d.change24h || d.returnRate;
 
   const isPositive = changePct >= 0;
-  const color = isPositive ? '#10b981' : '#ef4444';
+  const color = isPositive ? 'var(--success)' : 'var(--danger)';
 
   const prefix =
-    item.data.unit?.includes('USD') || item.category === 'crypto' || item.category === 'forex' ? '$'
+    d.unit?.includes('USD') || item.category === 'crypto' || item.category === 'forex' ? '$'
     : item.category === 'stock' || item.category === 'etf' || item.category === 'reits' ? '₩'
     : '';
   const suffix =
@@ -43,6 +43,10 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
 
   const formatVal = (val: number) => {
     if (val === undefined || isNaN(val)) return 'N/A';
+    if (val >= 1_000_000_000_000) return `${(val / 1_000_000_000_000).toFixed(1)}T`;
+    if (val >= 1_000_000_000) return `${(val / 1_000_000_000).toFixed(1)}B`;
+    if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(1)}M`;
+    if (val >= 100_000) return val.toLocaleString(undefined, { maximumFractionDigits: 0 });
     if (val > 1000) return val.toLocaleString(undefined, { maximumFractionDigits: 2 });
     return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
@@ -54,11 +58,11 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
       style={{
         borderColor: 'var(--border)',
         minHeight: '160px',
-        padding: '28px',
+        padding: '26px',
         overflow: 'visible',
         position: 'relative',
         zIndex: 1,
-        background: 'linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+        background: '#FFFFFF',
       }}
       onMouseEnter={e => { e.currentTarget.style.zIndex = '50'; }}
       onMouseLeave={e => { e.currentTarget.style.zIndex = '1'; }}
@@ -66,7 +70,7 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
       <div className="flex justify-between items-start mb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs px-2 py-0.5 rounded-md font-semibold" style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}>
+            <span className="text-xs px-2 py-0.5 rounded-md font-semibold" style={{ background: 'var(--brand-green-soft)', color: 'var(--brand-green-dark)' }}>
               {item.categoryKo}
             </span>
           </div>
@@ -74,18 +78,36 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
             {item.title}
           </h3>
           <p className="text-xs opacity-60 mt-0.5 line-clamp-1">
-            {item.data.ticker || item.data.symbol || item.data.pair || 'Market Asset'}
+            {d.ticker || d.symbol || d.pair || 'Market Asset'}
           </p>
         </div>
 
-        <div className="w-8 h-8 rounded-full flex items-center justify-center bg-white/5" style={{ color }}>
+        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: isPositive ? 'rgba(0,208,124,0.1)' : 'rgba(255,77,77,0.1)', color }}>
           {isPositive ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
         </div>
       </div>
 
-      <div className="flex items-end justify-between mt-auto" style={{ gap: '8px' }}>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div className="text-2xl font-black tabular-nums tracking-tight mb-1">
+      <div
+        className="mt-auto"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) 88px',
+          alignItems: 'end',
+          columnGap: '10px',
+        }}
+      >
+        <div style={{ minWidth: 0, overflow: 'hidden' }}>
+          <div
+            className="font-black tabular-nums mb-1"
+            style={{
+              fontSize: 'clamp(22px, 2vw, 26px)',
+              lineHeight: 1,
+              letterSpacing: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
             {prefix}{formatVal(currentVal)}{suffix}
           </div>
           <div className="flex items-center gap-1.5 text-sm font-bold" style={{ color }}>
@@ -93,19 +115,33 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
           </div>
         </div>
 
-        <div className="opacity-80 group-hover:opacity-100 transition-opacity" style={{ flexShrink: 0, overflow: 'visible', position: 'relative', zIndex: 10 }}>
+        <div
+          className="opacity-90 group-hover:opacity-100 transition-opacity"
+          style={{
+            flexShrink: 0,
+            overflow: 'visible',
+            position: 'relative',
+            zIndex: 10,
+            borderRadius: '12px',
+            padding: '5px 4px',
+            background: isPositive ? 'rgba(0,208,124,0.04)' : 'rgba(255,77,77,0.04)',
+            width: '88px',
+            height: '56px',
+          }}
+        >
           {chartData.length > 0 ? (
             <Sparkline
               data={chartData}
               color={color}
-              width={90}
-              height={50}
+              width="100%"
+              height="100%"
               dates={chartDates.length > 0 ? chartDates : undefined}
               prefix={prefix}
               suffix={suffix}
+              interactive
             />
           ) : (
-            <div className="w-[90px] h-[50px] flex items-center justify-center text-xs opacity-30">
+            <div className="w-full h-full flex items-center justify-center text-xs opacity-30">
               <Activity size={16} />
             </div>
           )}

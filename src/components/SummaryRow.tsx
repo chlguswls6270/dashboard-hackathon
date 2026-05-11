@@ -20,9 +20,9 @@ function MiniRadar({ m }: { m: Record<string,number> }) {
     <div style={{ width: 90, height: 60, marginTop: -12, marginBottom: -12 }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} margin={{ top:2, right:2, bottom:2, left:2 }}>
-          <PolarGrid stroke="rgba(255,255,255,0.12)" />
+          <PolarGrid stroke="var(--border)" />
           <PolarAngleAxis dataKey="metric" tick={false} />
-          <Radar dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.35} dot={false} />
+          <Radar dataKey="value" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.35} dot={false} />
         </RadarChart>
       </ResponsiveContainer>
     </div>
@@ -96,7 +96,7 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
 
   const formatChange = (val: number) => {
     const isPositive = val > 0;
-    const color = isPositive ? '#10b981' : val < 0 ? '#ef4444' : '#9ca3af';
+    const color = isPositive ? 'var(--success)' : val < 0 ? 'var(--danger)' : 'var(--text-muted)';
     return (
       <span style={{ color, fontWeight: 600, fontSize: '13px', width: '60px', textAlign: 'right' }}>
         {val > 0 ? '+' : ''}{val.toFixed(2)}%
@@ -115,10 +115,10 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
     };
 
     return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'rgba(255,255,255,0.4)', width: '100%', paddingRight: '24px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-muted)', width: '100%', paddingRight: '24px' }}>
         <span style={{ width: '32px', textAlign: 'right' }}>{formatNum(min)}</span>
-        <div style={{ flex: 1, height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', position: 'relative' }}>
-          <div style={{ position: 'absolute', left: `${percent}%`, top: '50%', transform: 'translate(-50%, -50%)', width: '8px', height: '8px', background: '#6366f1', borderRadius: '50%', boxShadow: '0 0 6px rgba(99,102,241,0.6)' }} />
+        <div style={{ flex: 1, height: '4px', background: 'var(--border)', borderRadius: '2px', position: 'relative' }}>
+          <div style={{ position: 'absolute', left: `${percent}%`, top: '50%', transform: 'translate(-50%, -50%)', width: '8px', height: '8px', background: 'var(--accent)', borderRadius: '50%', boxShadow: '0 0 6px rgba(0,208,124,0.45)' }} />
         </div>
         <span style={{ width: '32px' }}>{formatNum(max)}</span>
       </div>
@@ -126,7 +126,7 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
   };
 
   const isPositive = change1D >= 0;
-  const sparkColor = isPositive ? '#10b981' : '#ef4444';
+  const sparkColor = isPositive ? 'var(--success)' : 'var(--danger)';
 
   // ─── financial_metrics 전용 행 ───────────────────────────────────
   if (item.category === 'financial_metrics') {
@@ -134,10 +134,10 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
     const fmt = (v: number | undefined, unit = '') =>
       v != null ? `${v.toFixed(unit === '\uc5ed' ? 0 : unit === '\ubc30' ? 2 : 1)}${unit}` : '-';
     const hintColor = (v: number | undefined, good: number, ok: number, inv = false) => {
-      if (v == null) return 'rgba(255,255,255,0.3)';
+      if (v == null) return 'var(--text-muted)';
       const pass = inv ? v < good : v >= good;
       const mid  = inv ? v < ok  : v >= ok;
-      return pass ? '#10b981' : mid ? '#f59e0b' : '#ef4444';
+      return pass ? 'var(--success)' : mid ? 'var(--warning)' : 'var(--danger)';
     };
     return (
       <div
@@ -147,17 +147,17 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
           gridTemplateColumns: '1.4fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 90px',
           alignItems: 'center',
           padding: '12px 24px',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          borderBottom: '1px solid var(--border)',
           cursor: 'pointer',
           transition: 'background 0.2s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-secondary)'; }}
         onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
       >
         {/* 회사명 */}
         <div style={{ display:'flex', flexDirection:'column', paddingRight:12, overflow:'hidden' }}>
-          <span style={{ fontSize:14, fontWeight:700, color:'rgba(255,255,255,0.95)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title}</span>
-          <span style={{ fontSize:11, color:'rgba(99,102,241,0.8)', fontWeight:600, marginTop:2 }}>{d.ticker ?? ''}</span>
+          <span style={{ fontSize:14, fontWeight:700, color:'var(--text-primary)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.title}</span>
+          <span style={{ fontSize:11, color:'var(--brand-blue)', fontWeight:600, marginTop:2 }}>{d.ticker ?? ''}</span>
         </div>
         {/* 지표 컬럼들 */}
         {[
@@ -170,7 +170,7 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
           { label:'\ub9e4\ucd9c\uc131\uc7a5', value: m.revenueGrowth != null ? `${m.revenueGrowth > 0 ? '+' : ''}${m.revenueGrowth.toFixed(1)}%` : '-', color: hintColor(m.revenueGrowth, 10, 0) },
         ].map(({ label, value, color }) => (
           <div key={label} style={{ textAlign:'right', paddingRight:20 }}>
-            <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', marginBottom:2 }}>{label}</div>
+            <div style={{ fontSize:10, color:'var(--text-muted)', marginBottom:2 }}>{label}</div>
             <div style={{ fontSize:13, fontWeight:700, color }}>{value}</div>
           </div>
         ))}
@@ -190,12 +190,12 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
         gridTemplateColumns: '1.2fr 0.8fr 0.6fr 0.6fr 0.6fr 0.6fr 0.6fr 1.2fr 1.2fr 90px',
         alignItems: 'center',
         padding: '16px 24px',
-        borderBottom: '1px solid rgba(255,255,255,0.04)',
+        borderBottom: '1px solid var(--border)',
         cursor: 'pointer',
         transition: 'all 0.2s',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+        e.currentTarget.style.background = 'var(--bg-secondary)';
       }}
       onMouseLeave={e => {
         e.currentTarget.style.background = 'transparent';
@@ -203,18 +203,18 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
     >
       {/* Name & Symbol */}
       <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, paddingRight: '16px' }}>
-        <span style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(255,255,255,0.95)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {item.title}
         </span>
         {subValue && (
-          <span style={{ fontSize: '12px', color: 'rgba(99,102,241,0.9)', fontWeight: 600, marginTop: '2px' }}>
+          <span style={{ fontSize: '12px', color: 'var(--brand-blue)', fontWeight: 600, marginTop: '2px' }}>
             {subValue}
           </span>
         )}
       </div>
 
       {/* Price */}
-      <div style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', textAlign: 'right', paddingRight: '24px' }}>
+      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', textAlign: 'right', paddingRight: '24px' }}>
         {mainValue}
       </div>
 
@@ -234,7 +234,7 @@ export default function SummaryRow({ item, onClick }: { item: ProcessedData; onC
         {sparkData.length > 0 ? (
           <Sparkline data={sparkData} color={sparkColor} />
         ) : (
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)' }}>No Data</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No Data</span>
         )}
       </div>
     </div>

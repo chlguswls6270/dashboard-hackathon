@@ -43,7 +43,7 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
   }
 
   const isPositive = changePercent >= 0;
-  const color = isPositive ? '#10b981' : '#ef4444';
+  const color = isPositive ? 'var(--success)' : 'var(--danger)';
 
   return (
     <button
@@ -55,9 +55,9 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
         textAlign: 'left',
         padding: '20px 24px',
         borderRadius: '16px',
-        border: '1px solid rgba(255,255,255,0.08)',
-        background: 'rgba(20, 27, 45, 0.85)',
-        backdropFilter: 'blur(16px)',
+        border: '1px solid var(--border)',
+        background: 'var(--surface-raised)',
+        boxShadow: 'var(--shadow-card)',
         cursor: 'pointer',
         transition: 'all 0.22s cubic-bezier(0.4,0,0.2,1)',
         minHeight: '120px',
@@ -65,15 +65,15 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
       }}
       onMouseEnter={e => {
         const el = e.currentTarget;
-        el.style.borderColor = 'rgba(99, 102, 241, 0.45)';
+        el.style.borderColor = 'rgba(0, 208, 124, 0.35)';
         el.style.transform = 'translateY(-2px)';
-        el.style.boxShadow = '0 12px 36px rgba(99,102,241,0.14), 0 0 0 1px rgba(99,102,241,0.1)';
+        el.style.boxShadow = 'var(--shadow-hover)';
       }}
       onMouseLeave={e => {
         const el = e.currentTarget;
-        el.style.borderColor = 'rgba(255,255,255,0.08)';
+        el.style.borderColor = 'var(--border)';
         el.style.transform = 'translateY(0)';
-        el.style.boxShadow = 'none';
+        el.style.boxShadow = 'var(--shadow-card)';
       }}
     >
       {/* Top */}
@@ -82,11 +82,11 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
           <h3 style={{
             fontWeight: 700, fontSize: '15px', marginBottom: '4px',
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            maxWidth: '160px', color: 'rgba(255,255,255,0.92)',
+            maxWidth: '160px', color: 'var(--text-primary)',
           }}>
             {item.title}
           </h3>
-          <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.38)' }}>
+          <p style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
             {subValue || item.categoryKo}
           </p>
         </div>
@@ -99,7 +99,7 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
 
       {/* Bottom */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-        <p style={{ fontSize: '18px', fontWeight: 800, color: 'rgba(255,255,255,0.95)', letterSpacing: '-0.5px' }}>
+        <p style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>
           {mainValue}
         </p>
         {changePercent !== 0 && (

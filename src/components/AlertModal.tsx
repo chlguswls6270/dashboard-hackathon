@@ -46,13 +46,14 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
       <div className="relative glass z-10 p-6 sm:p-8 rounded-3xl max-w-md w-full mx-4 border animate-in slide-in-from-bottom-4 duration-300 shadow-2xl" style={{ borderColor: 'var(--border)' }}>
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-white/10 transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-full transition-colors"
+          style={{ color: 'var(--text-muted)' }}
         >
-          <X size={20} className="text-white/50 hover:text-white" />
+          <X size={20} />
         </button>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-yellow-500/20 text-yellow-400">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', color: 'var(--warning)' }}>
             <BellRing size={20} />
           </div>
           <h2 className="text-xl font-bold">새 알림 추가</h2>
@@ -60,23 +61,25 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">알림 이름</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>알림 이름</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="예: 삼성전자 익절 타이밍"
-              className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500 transition-colors"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">대상 종목</label>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>대상 종목</label>
             <select
               value={targetItemId}
               onChange={(e) => setTargetItemId(e.target.value)}
-              className="w-full bg-[#1a1b26] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors appearance-none"
+              className="w-full border rounded-xl px-4 py-3 focus:outline-none transition-colors appearance-none"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               required
             >
               {cachedData.map(d => (
@@ -88,8 +91,8 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1.5">
-              목표 가격 <span className="text-xs text-indigo-400 ml-1">{currentValStr}</span>
+            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+              목표 가격 <span className="text-xs ml-1" style={{ color: 'var(--brand-blue)' }}>{currentValStr}</span>
             </label>
             <div className="flex gap-3">
               <input
@@ -98,13 +101,15 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
                 value={targetPrice}
                 onChange={(e) => setTargetPrice(e.target.value)}
                 placeholder="가격 입력"
-                className="flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:border-indigo-500 transition-colors"
+                className="flex-1 border rounded-xl px-4 py-3 focus:outline-none transition-colors"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                 required
               />
               <select
                 value={condition}
                 onChange={(e) => setCondition(e.target.value as 'above' | 'below')}
-                className="w-32 bg-[#1a1b26] border border-white/10 rounded-xl px-3 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors appearance-none text-center"
+                className="w-32 border rounded-xl px-3 py-3 focus:outline-none transition-colors appearance-none text-center"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               >
                 <option value="above">이상 도달 시</option>
                 <option value="below">이하 도달 시</option>
@@ -115,7 +120,8 @@ export default function AlertModal({ cachedData, onClose, onSave }: AlertModalPr
           <button
             type="submit"
             disabled={!name.trim() || !targetItemId || !targetPrice}
-            className="w-full mt-2 py-3.5 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-lg bg-indigo-500 hover:bg-indigo-600"
+            className="w-full mt-2 py-3.5 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 shadow-lg"
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--brand-blue))' }}
           >
             알림 생성하기
           </button>

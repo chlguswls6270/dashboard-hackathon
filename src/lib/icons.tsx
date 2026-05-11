@@ -18,6 +18,7 @@ export const CAT_ICONS: Record<CategoryKey, React.ReactNode> = {
   derivatives:       <Zap          size={24} />,
   funds:             <BookOpen     size={24} />,
   reits:             <Warehouse    size={24} />,
+  dynamic:           <Globe        size={24} />,
 };
 
 export const CAT_ICONS_SMALL: Record<CategoryKey, React.ReactNode> = {
@@ -36,4 +37,5 @@ export const CAT_ICONS_SMALL: Record<CategoryKey, React.ReactNode> = {
   derivatives:       <Zap          size={15} />,
   funds:             <BookOpen     size={15} />,
   reits:             <Warehouse    size={15} />,
+  dynamic:           <Globe        size={15} />,
 };

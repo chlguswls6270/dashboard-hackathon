@@ -7,14 +7,14 @@ const HEADLINE_NEWS = [
   {
     id: 1,
     category: '긴급',
-    categoryColor: '#ef4444',
+    categoryColor: 'var(--danger)',
     title: 'AI 반도체 패권 전쟁 2라운드... 엔비디아 H200 품귀, 삼성·SK하이닉스 반사 수혜 주목',
     summary: '생성형 AI 학습용 H200 GPU 수요가 공급을 3배 이상 초과하며 품귀 현상이 심화되고 있다. 이에 따라 HBM 메모리 시장을 선도하는 국내 반도체 기업들이 최대 수혜주로 급부상하고 있다.',
     source: '글로벌경제',
     time: '5분 전',
     tag: '#반도체 #AI #엔비디아',
-    bg: 'linear-gradient(135deg, rgba(99,102,241,0.35) 0%, rgba(139,92,246,0.20) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#818cf8',
+    bg: 'linear-gradient(135deg, rgba(0,208,124,0.16) 0%, rgba(0,122,255,0.10) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-green)',
   },
   {
     id: 2,
@@ -25,44 +25,44 @@ const HEADLINE_NEWS = [
     source: '파이낸스뉴스',
     time: '32분 전',
     tag: '#FOMC #금리인하 #채권',
-    bg: 'linear-gradient(135deg, rgba(245,158,11,0.30) 0%, rgba(234,179,8,0.15) 60%, rgba(20,27,45,0) 100%)',
+    bg: 'linear-gradient(135deg, rgba(245,158,11,0.16) 0%, rgba(0,208,124,0.08) 60%, rgba(255,255,255,0) 100%)',
     accent: '#fbbf24',
   },
   {
     id: 3,
     category: '분석',
-    categoryColor: '#10b981',
+    categoryColor: 'var(--brand-green)',
     title: '비트코인, 1억 2천만 원 돌파 후 숨 고르기... 기관 ETF 순매수 사상 최대',
     summary: '비트코인 현물 ETF로의 기관 자금 유입이 사상 최대 규모를 기록한 가운데, 단기 차익 실현 물량이 맞물리며 횡보 구간이 연출되고 있다. 온체인 데이터는 장기 보유자의 매집 지속을 시사한다.',
     source: '크립토투데이',
     time: '1시간 전',
     tag: '#비트코인 #ETF #기관',
-    bg: 'linear-gradient(135deg, rgba(16,185,129,0.30) 0%, rgba(5,150,105,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#34d399',
+    bg: 'linear-gradient(135deg, rgba(0,208,124,0.16) 0%, rgba(0,122,255,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-green)',
   },
   {
     id: 4,
     category: '특집',
-    categoryColor: '#60a5fa',
+    categoryColor: 'var(--brand-blue)',
     title: '2025 하반기 글로벌 경제 전망: 연착륙이냐 스태그플레이션이냐',
     summary: '월가 주요 IB들이 하반기 시나리오를 놓고 엇갈린 전망을 내놓고 있다. 골드만삭스는 연착륙 시나리오를 유지한 반면, JP모건은 스태그플레이션 리스크를 경고하며 방어적 포트폴리오를 권고했다.',
     source: '이코노믹리뷰',
     time: '2시간 전',
     tag: '#거시경제 #IB전망 #하반기',
-    bg: 'linear-gradient(135deg, rgba(96,165,250,0.30) 0%, rgba(59,130,246,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#60a5fa',
+    bg: 'linear-gradient(135deg, rgba(0,122,255,0.14) 0%, rgba(0,208,124,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-blue)',
   },
   {
     id: 5,
     category: '이슈',
-    categoryColor: '#ec4899',
+    categoryColor: 'var(--brand-blue)',
     title: '현대차·기아, 글로벌 전기차 판매량 3위 달성... 테슬라·BYD 맹추격',
     summary: '현대차그룹이 올해 1분기 전기차 판매량에서 글로벌 3위를 달성했다. 아이오닉 6·EV9 등 프리미엄 라인업이 유럽과 미국 시장에서 호평을 받으며 시장 점유율이 빠르게 확대되고 있다.',
     source: '모터트렌드코리아',
     time: '3시간 전',
     tag: '#현대차 #전기차 #EV',
-    bg: 'linear-gradient(135deg, rgba(236,72,153,0.28) 0%, rgba(219,39,119,0.14) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#f472b6',
+    bg: 'linear-gradient(135deg, rgba(0,122,255,0.12) 0%, rgba(0,208,124,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-blue)',
   },
 ];
 
@@ -70,38 +70,38 @@ const STOCK_NEWS = [
   {
     id: 1,
     category: '특징주',
-    categoryColor: '#ef4444',
+    categoryColor: 'var(--danger)',
     title: '엔비디아 훈풍에 韓 반도체 투톱 "훨훨"... 삼성전자 8만 전자 탈환하나',
     summary: '글로벌 AI 반도체 대장주 엔비디아의 어닝 서프라이즈에 힘입어 국내 반도체 투톱인 삼성전자와 SK하이닉스에 외국인 매수세가 집중되고 있다.',
     source: '한국증권경제',
     time: '10분 전',
     tag: '#삼성전자 #SK하이닉스 #반도체',
-    bg: 'linear-gradient(135deg, rgba(239,68,68,0.25) 0%, rgba(220,38,38,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#f87171',
+    bg: 'linear-gradient(135deg, rgba(255,77,77,0.14) 0%, rgba(0,122,255,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--danger)',
   },
   {
     id: 2,
     category: '공시',
-    categoryColor: '#3b82f6',
+    categoryColor: 'var(--brand-blue)',
     title: '현대차, 주주환원 정책 확대 발표... "올해 자사주 1조원 매입·소각"',
     summary: '현대자동차가 주주가치 제고를 위해 역대 최대 규모인 1조원 규모의 자사주 매입 및 소각 계획을 발표했다. 발표 직후 주가는 4%대 급등세를 보이고 있다.',
     source: '마켓인사이트',
     time: '45분 전',
     tag: '#현대차 #주주환원 #자사주소각',
-    bg: 'linear-gradient(135deg, rgba(59,130,246,0.25) 0%, rgba(37,99,235,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#60a5fa',
+    bg: 'linear-gradient(135deg, rgba(0,122,255,0.14) 0%, rgba(0,208,124,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-blue)',
   },
   {
     id: 3,
     category: '시황',
-    categoryColor: '#10b981',
+    categoryColor: 'var(--brand-green)',
     title: '코스피, 기관 순매수에 2700선 안착 시도... 밸류업 프로그램 수혜주 강세',
     summary: '정부의 기업 밸류업 프로그램 가이드라인 발표를 앞두고 저PBR 관련주로 분류되는 금융, 지주사들이 강세를 보이며 지수 상승을 견인하고 있다.',
     source: '여의도저널',
     time: '2시간 전',
     tag: '#코스피 #밸류업 #저PBR',
-    bg: 'linear-gradient(135deg, rgba(16,185,129,0.25) 0%, rgba(5,150,105,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#34d399',
+    bg: 'linear-gradient(135deg, rgba(0,208,124,0.14) 0%, rgba(0,122,255,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-green)',
   }
 ];
 
@@ -109,14 +109,14 @@ const ETF_NEWS = [
   {
     id: 1,
     category: '신규상장',
-    categoryColor: '#8b5cf6',
+    categoryColor: 'var(--brand-blue)',
     title: '글로벌 AI 인프라 집중 투자 ETF 3종 동시 상장... 첫날부터 뭉칫돈',
     summary: '데이터센터, 전력망, 냉각 시스템 등 AI 인프라 밸류체인 전반에 투자하는 새로운 ETF들이 상장 첫날부터 개인 투자자들의 집중 매수세를 받고 있다.',
     source: 'ETF트렌드',
     time: '30분 전',
     tag: '#ETF #AI인프라 #신규상장',
-    bg: 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(124,58,237,0.15) 60%, rgba(20,27,45,0) 100%)',
-    accent: '#a78bfa',
+    bg: 'linear-gradient(135deg, rgba(0,122,255,0.14) 0%, rgba(0,208,124,0.08) 60%, rgba(255,255,255,0) 100%)',
+    accent: 'var(--brand-blue)',
   }
 ];
 
@@ -161,9 +161,10 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
       {/* Background */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'rgba(14, 20, 36, 0.97)',
+        background: 'var(--surface-raised)',
         borderRadius: '20px',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--shadow-card)',
       }} />
       <div style={{
         position: 'absolute', inset: 0,
@@ -191,16 +192,16 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
           }}>
             {news.category}
           </span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>{news.source}</span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)' }}>·</span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.35)' }}>{news.time}</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{news.source}</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>·</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{news.time}</span>
           <span style={{ marginLeft: 'auto', fontSize: '11px', color: news.accent, opacity: 0.7 }}>{news.tag}</span>
         </div>
 
         {/* Title */}
         <h2 style={{
           fontSize: '20px', fontWeight: 800, lineHeight: 1.4,
-          color: 'rgba(255,255,255,0.95)', marginBottom: '10px',
+          color: 'var(--text-primary)', marginBottom: '10px',
           maxWidth: '780px',
         }}>
           {news.title}
@@ -209,7 +210,7 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
         {/* Summary */}
         <p style={{
           fontSize: '13px', lineHeight: 1.7,
-          color: 'rgba(255,255,255,0.55)',
+          color: 'var(--text-secondary)',
           maxWidth: '720px',
         }}>
           {news.summary}
@@ -243,7 +244,7 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
         padding: '0 32px 18px',
       }}>
         {/* Progress bar */}
-        <div style={{ flex: 1, height: '2px', background: 'rgba(255,255,255,0.08)', borderRadius: '2px', overflow: 'hidden' }}>
+        <div style={{ flex: 1, height: '2px', background: 'var(--border)', borderRadius: '2px', overflow: 'hidden' }}>
           <div style={{
             height: '100%', width: `${progress}%`,
             background: news.accent,
@@ -262,7 +263,7 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
                 width: i === current ? '18px' : '6px',
                 height: '6px',
                 borderRadius: '3px',
-                background: i === current ? news.accent : 'rgba(255,255,255,0.25)',
+                background: i === current ? news.accent : 'var(--border-light)',
                 border: 'none', cursor: 'pointer', padding: 0,
                 transition: 'all 0.3s ease',
               }}
@@ -278,12 +279,12 @@ export default function NewsBanner({ onMockClick, categoryKey }: { onMockClick: 
               onClick={fn}
               style={{
                 width: '26px', height: '26px', borderRadius: '50%',
-                background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
+                background: 'var(--bg-secondary)', border: '1px solid var(--border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'rgba(255,255,255,0.7)', transition: 'all 0.2s',
+                cursor: 'pointer', color: 'var(--text-secondary)', transition: 'all 0.2s',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = news.accent; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.color = 'rgba(255,255,255,0.7)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-secondary)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
             >
               {icon}
             </button>

@@ -17,10 +17,10 @@ const PERIODS = [
 ];
 
 const tooltipStyle = {
-  backgroundColor: '#0f1629',
-  border: '1px solid rgba(255,255,255,0.1)',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid var(--border)',
   borderRadius: 12,
-  color: '#e2e8f0',
+  color: '#1A1A1A',
   fontSize: 12,
   padding: '10px 14px',
 };
@@ -53,23 +53,22 @@ export default function ETFPriceChart({ priceHistory }: { priceHistory: PricePoi
   const firstPrice = filtered[0]?.price ?? 0;
   const change = firstPrice ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0;
   const isUp = change >= 0;
-  // 한국 ETF: 상승=빨강, 하락=파랑
-  const lineColor = isUp ? '#ef4444' : '#3b82f6';
+  const lineColor = isUp ? 'var(--success)' : 'var(--danger)';
 
   return (
     <div style={{ marginTop: '28px' }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)' }}>가격 추이</span>
+          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>가격 추이</span>
           <span style={{ fontSize: '13px', fontWeight: 700, color: lineColor }}>
             {change > 0 ? '+' : ''}{change.toFixed(2)}%
           </span>
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>({period} 기준)</span>
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({period} 기준)</span>
         </div>
 
         {/* Period selector */}
-        <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '3px', gap: '2px' }}>
+        <div style={{ display: 'flex', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: '10px', padding: '3px', gap: '2px' }}>
           {PERIODS.map(({ label }) => (
             <button
               key={label}
@@ -77,8 +76,8 @@ export default function ETFPriceChart({ priceHistory }: { priceHistory: PricePoi
               style={{
                 padding: '5px 12px', fontSize: '12px', fontWeight: 600,
                 borderRadius: '8px', border: 'none', cursor: 'pointer',
-                background: period === label ? 'rgba(99,102,241,0.3)' : 'transparent',
-                color: period === label ? '#a5b4fc' : 'rgba(255,255,255,0.4)',
+                background: period === label ? 'var(--brand-green-soft)' : 'transparent',
+                color: period === label ? 'var(--brand-green-dark)' : 'var(--text-secondary)',
                 transition: 'all 0.2s',
               }}
             >
@@ -97,11 +96,11 @@ export default function ETFPriceChart({ priceHistory }: { priceHistory: PricePoi
               <stop offset="95%" stopColor={lineColor} stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
           <XAxis
             dataKey="date"
             tickFormatter={fmtDate}
-            tick={{ fill: '#475569', fontSize: 10 }}
+            tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             interval={Math.max(1, Math.floor(filtered.length / 10))}
@@ -109,7 +108,7 @@ export default function ETFPriceChart({ priceHistory }: { priceHistory: PricePoi
           <YAxis
             domain={[priceMin, priceMax]}
             tickFormatter={v => fmtPrice(v)}
-            tick={{ fill: '#475569', fontSize: 10 }}
+            tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
             tickLine={false}
             axisLine={false}
             width={72}

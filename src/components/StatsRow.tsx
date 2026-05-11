@@ -5,9 +5,9 @@ import { type ProcessedData } from '@/lib/types';
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
     <div className="glass flex flex-col justify-center" style={{ padding: '24px' }}>
-      <p className="text-xs mb-1" style={{ color: 'rgba(255,255,255,0.5)', fontWeight: 600, letterSpacing: '0.05em' }}>{label}</p>
-      <p className="text-2xl font-bold mt-1" style={{ color: color ?? 'rgba(255,255,255,0.95)' }}>{value}</p>
-      {sub && <p className="text-xs mt-1" style={{ color: 'rgba(99,102,241,0.8)' }}>{sub}</p>}
+      <p className="text-xs mb-1" style={{ color: 'var(--text-secondary)', fontWeight: 600, letterSpacing: '0.05em' }}>{label}</p>
+      <p className="text-2xl font-bold mt-1" style={{ color: color ?? 'var(--text-primary)' }}>{value}</p>
+      {sub && <p className="text-xs mt-1" style={{ color: 'var(--brand-blue)' }}>{sub}</p>}
     </div>
   );
 }

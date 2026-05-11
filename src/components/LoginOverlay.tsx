@@ -19,7 +19,7 @@ export default function LoginOverlay({ onLogin }: { onLogin: (name: string) => v
       
       <div className="relative glass z-10 p-8 rounded-3xl max-w-md w-full mx-4 border animate-in slide-in-from-bottom-8 duration-500 shadow-2xl" style={{ borderColor: 'var(--border)' }}>
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white' }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, var(--accent), var(--brand-blue))', color: '#FFFFFF' }}>
             <User size={32} />
           </div>
         </div>
@@ -37,15 +37,15 @@ export default function LoginOverlay({ onLogin }: { onLogin: (name: string) => v
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="닉네임 입력 (예: 주식왕)"
-            className="w-full bg-white/5 border rounded-xl px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#8b5cf6] transition-all"
-            style={{ borderColor: 'var(--border)' }}
+            className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--brand-blue)] transition-all"
+            style={{ borderColor: 'var(--border)', background: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
             autoFocus
           />
           <button
             type="submit"
             disabled={!name.trim()}
             className="w-full py-3 rounded-xl font-bold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5 hover:shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--brand-blue))' }}
           >
             시작하기
           </button>

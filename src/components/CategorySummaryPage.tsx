@@ -55,7 +55,7 @@ export default function CategorySummaryPage({ category, items, onSelectItem }: C
   return (
     <div className="animate-fade-up">
       <div style={{ marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-primary)' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-primary)' }}>
           <span style={{ color: meta.color, display: 'flex' }}>{CAT_ICONS[category]}</span>
           {meta.ko} 요약
         </h2>
@@ -81,23 +81,22 @@ export default function CategorySummaryPage({ category, items, onSelectItem }: C
             <h3 style={{
               fontSize: '14px',
               fontWeight: 800,
-              color: 'rgba(255,255,255,0.9)',
+              color: 'var(--text-primary)',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
-              borderBottom: '2px solid rgba(255,255,255,0.1)',
+              borderBottom: '2px solid var(--brand-green)',
               paddingBottom: '8px',
               display: 'inline-block'
             }}>
               {groupName}
             </h3>
             <div style={{
-              background: 'rgba(20, 27, 45, 0.65)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '20px',
+              background: 'var(--surface-raised)',
+              border: '1px solid var(--border)',
+              borderRadius: '16px',
               overflow: 'hidden',
-              boxShadow: '0 12px 40px rgba(0,0,0,0.2)',
+              boxShadow: 'var(--shadow-card)',
             }}>
               {/* Table Header */}
               <div style={{
@@ -107,11 +106,11 @@ export default function CategorySummaryPage({ category, items, onSelectItem }: C
                   : '1.2fr 0.8fr 0.6fr 0.6fr 0.6fr 0.6fr 0.6fr 1.2fr 1.2fr 90px',
                 alignItems: 'center',
                 padding: '16px 24px',
-                borderBottom: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(0,0,0,0.2)',
+                borderBottom: '1px solid var(--border)',
+                background: 'var(--bg-secondary)',
                 fontSize: '12px',
                 fontWeight: 700,
-                color: 'rgba(255,255,255,0.5)',
+                color: 'var(--text-secondary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
               }}>
@@ -150,17 +149,17 @@ export default function CategorySummaryPage({ category, items, onSelectItem }: C
                     onClick={() => toggleGroup(groupName)}
                     style={{ 
                       padding: '16px', textAlign: 'center', cursor: 'pointer', 
-                      borderTop: '1px solid rgba(255,255,255,0.04)', 
-                      color: 'rgba(255,255,255,0.5)', fontSize: '13px', fontWeight: 600, 
-                      transition: 'all 0.2s', background: 'rgba(255,255,255,0.01)' 
+                      borderTop: '1px solid var(--border)', 
+                      color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 600, 
+                      transition: 'all 0.2s', background: 'var(--bg-card)' 
                     }}
                     onMouseEnter={e => {
-                      e.currentTarget.style.color = '#fff';
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                      e.currentTarget.style.color = 'var(--brand-green-dark)';
+                      e.currentTarget.style.background = 'var(--bg-card-hover)';
                     }}
                     onMouseLeave={e => {
-                      e.currentTarget.style.color = 'rgba(255,255,255,0.5)';
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.01)';
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.background = 'var(--bg-card)';
                     }}
                   >
                     {isExpanded ? '접기 (Collapse)' : `+ ${groupItems.length - 5}개 종목 더보기`}

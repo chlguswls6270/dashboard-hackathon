@@ -2,18 +2,17 @@
 
 import { CATEGORY_META, type CategoryKey, type ProcessedData } from '@/lib/types';
 import { CAT_ICONS_SMALL } from '@/lib/icons';
-import { Trash2, BarChart2, Home, Download } from 'lucide-react';
+import { BarChart2, Home, Download } from 'lucide-react';
 
 interface SidebarProps {
   cachedData: ProcessedData[];
   activeTab: string;
   onSelectTab: (tab: string) => void;
-  onClearCache: () => void;
 }
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_META).filter(c => c !== 'dynamic') as CategoryKey[];
 
-export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCache }: SidebarProps) {
+export default function Sidebar({ cachedData, activeTab, onSelectTab }: SidebarProps) {
   const categoryCounts = cachedData.reduce((acc, item) => {
     acc[item.category] = (acc[item.category] || 0) + 1;
     return acc;
@@ -23,9 +22,19 @@ export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCac
   const totalItems = cachedData.length;
 
   return (
-    <aside className="w-64 flex flex-col h-full border-r" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
+    <aside className="w-56 flex flex-col h-full border-r" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}>
       {/* Logo */}
-      <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--border)' }}>
+      <div
+        style={{
+          height: '80px',
+          minHeight: '80px',
+          padding: '0 20px',
+          borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
           <BarChart2 size={22} style={{ color: 'var(--accent)', flexShrink: 0 }} />
           <span style={{ fontWeight: 800, fontSize: '18px' }} className="gradient-text">모아차트</span>
@@ -40,22 +49,22 @@ export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCac
             onClick={() => onSelectTab('home')}
             className={`tab-item w-full text-left transition-all ${activeTab === 'home' ? 'active' : ''}`}
           >
-            <Home size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-            <span className="flex-1 font-medium">홈</span>
+            <Home size={15} style={{ color: 'currentColor', flexShrink: 0 }} />
+            <span className="tab-label flex-1 font-medium">홈</span>
           </button>
           <button
             onClick={() => onSelectTab('upload')}
             className={`tab-item w-full text-left transition-all ${activeTab === 'upload' ? 'active' : ''}`}
           >
-            <Download size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-            <span className="flex-1 font-medium">데이터 불러오기</span>
+            <Download size={15} style={{ color: 'currentColor', flexShrink: 0 }} />
+            <span className="tab-label flex-1 font-medium">데이터 불러오기</span>
           </button>
           <button
             onClick={() => onSelectTab('uploaded')}
             className={`tab-item w-full text-left transition-all ${activeTab === 'uploaded' ? 'active' : ''}`}
           >
-            <BarChart2 size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
-            <span className="flex-1 font-medium">내가 올린 데이터</span>
+            <BarChart2 size={15} style={{ color: 'currentColor', flexShrink: 0 }} />
+            <span className="tab-label flex-1 font-medium">내가 올린 데이터</span>
           </button>
         </div>
 
@@ -73,15 +82,10 @@ export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCac
                 disabled={!isCached}
                 className={`tab-item w-full text-left transition-all ${activeTab === cat ? 'active' : ''} ${!isCached ? 'opacity-30 cursor-not-allowed' : ''}`}
               >
-                <span style={{ color: activeTab === cat ? 'var(--accent)' : 'var(--text-muted)', flexShrink: 0, display: 'flex' }}>
+                <span style={{ color: 'currentColor', flexShrink: 0, display: 'flex' }}>
                   {CAT_ICONS_SMALL[cat]}
                 </span>
-                <span className="flex-1">{meta.ko}</span>
-                {isCached && (
-                  <span className="text-xs px-1.5 py-0.5 rounded-md" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
-                    {categoryCounts[cat]}
-                  </span>
-                )}
+                <span className="tab-label flex-1">{meta.ko}</span>
               </button>
             );
           })}
@@ -90,18 +94,10 @@ export default function Sidebar({ cachedData, activeTab, onSelectTab, onClearCac
 
       {/* Footer */}
       {totalItems > 0 && (
-        <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
-          <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
+        <div className="px-5 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
             총 {totalItems}개 데이터 캐시됨
           </p>
-          <button
-            onClick={onClearCache}
-            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all hover:bg-red-500/10"
-            style={{ color: 'var(--danger)' }}
-          >
-            <Trash2 size={12} />
-            캐시 초기화
-          </button>
         </div>
       )}
     </aside>

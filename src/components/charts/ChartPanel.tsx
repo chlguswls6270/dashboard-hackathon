@@ -23,19 +23,19 @@ const PF_PERIODS = [
 ];
 
 const ALLOC_COLORS: Record<string,string> = {
-  '주식':'#6366f1','ETF':'#8b5cf6','채권':'#06b6d4','원자재':'#f59e0b',
-  '암호화폐':'#ef4444','외환':'#f97316','리츠':'#22c55e','현금':'#94a3b8',
+  '주식':'var(--accent)','ETF':'var(--brand-blue)','채권':'#06b6d4','원자재':'#f59e0b',
+  '암호화폐':'var(--danger)','외환':'#f97316','리츠':'#22c55e','현금':'#94a3b8',
 };
 
 const CAT_COLORS: Record<string,string> = {
-  stock:'#6366f1', etf:'#8b5cf6', bonds:'#06b6d4',
-  commodities:'#f59e0b', crypto:'#ef4444', forex:'#f97316',
+  stock:'var(--accent)', etf:'var(--brand-blue)', bonds:'#06b6d4',
+  commodities:'#f59e0b', crypto:'var(--danger)', forex:'#f97316',
   reits:'#22c55e',
 };
 
 const pfTooltipStyle = {
-  backgroundColor:'#0f1629', border:'1px solid rgba(255,255,255,0.1)',
-  borderRadius:12, color:'#e2e8f0', fontSize:12, padding:'10px 14px',
+  backgroundColor:'#FFFFFF', border:'1px solid var(--border)',
+  borderRadius:12, color:'#1A1A1A', fontSize:12, padding:'10px 14px',
 };
 
 function fmtPfDate(d: string) {
@@ -81,7 +81,7 @@ function PortfolioDetailChart({
   const lastVal = filtered[filtered.length - 1]?.value ?? 0;
   const change = firstVal ? ((lastVal - firstVal) / firstVal) * 100 : 0;
   const isUp = change >= 0;
-  const lineColor = isUp ? '#ef4444' : '#3b82f6';
+  const lineColor = isUp ? 'var(--success)' : 'var(--danger)';
 
   return (
     <div style={{ display:'flex', flexDirection:'column', gap:28 }}>
@@ -90,19 +90,19 @@ function PortfolioDetailChart({
       <div>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, flexWrap:'wrap', gap:10 }}>
           <div style={{ display:'flex', alignItems:'baseline', gap:10 }}>
-            <span style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.5)' }}>성과 추이 vs 벤치마크</span>
+            <span style={{ fontSize:13, fontWeight:600, color:'var(--text-secondary)' }}>성과 추이 vs 벤치마크</span>
             <span style={{ fontSize:13, fontWeight:700, color: lineColor }}>
               {change > 0 ? '+' : ''}{change.toFixed(2)}%
             </span>
-            <span style={{ fontSize:11, color:'rgba(255,255,255,0.3)' }}>({period} 기준)</span>
+            <span style={{ fontSize:11, color:'var(--text-muted)' }}>({period} 기준)</span>
           </div>
           {/* 기간 선택 */}
-          <div style={{ display:'flex', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:10, padding:3, gap:2 }}>
+          <div style={{ display:'flex', background:'var(--bg-secondary)', border:'1px solid var(--border)', borderRadius:10, padding:3, gap:2 }}>
             {PF_PERIODS.map(({ label }) => (
               <button key={label} onClick={() => setPeriod(label)} style={{
                 padding:'5px 12px', fontSize:12, fontWeight:600, borderRadius:8, border:'none', cursor:'pointer',
-                background: period === label ? 'rgba(99,102,241,0.3)' : 'transparent',
-                color: period === label ? '#a5b4fc' : 'rgba(255,255,255,0.4)',
+                background: period === label ? 'var(--brand-green-soft)' : 'transparent',
+                color: period === label ? 'var(--brand-green-dark)' : 'var(--text-secondary)',
                 transition:'all 0.2s',
               }}>{label}</button>
             ))}
@@ -111,16 +111,16 @@ function PortfolioDetailChart({
 
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={filtered} margin={{ top:4, right:8, bottom:0, left:0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="date" tickFormatter={fmtPfDate}
-              tick={{ fill:'#475569', fontSize:10 }} tickLine={false} axisLine={false}
+              tick={{ fill:'var(--text-muted)', fontSize:10 }} tickLine={false} axisLine={false}
               interval={Math.max(1, Math.floor(filtered.length/10))}
             />
             <YAxis
               domain={[yMin, yMax]}
               tickFormatter={fmtPfMoney}
-              tick={{ fill:'#475569', fontSize:10 }} tickLine={false} axisLine={false}
+              tick={{ fill:'var(--text-muted)', fontSize:10 }} tickLine={false} axisLine={false}
               orientation="right" width={80}
             />
             <Tooltip
@@ -128,9 +128,9 @@ function PortfolioDetailChart({
               formatter={(v: any, n: any) => [fmtPfMoney(v as number), n as string]}
               labelFormatter={(d: any) => fmtPfDate(d as string)}
             />
-            <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
+            <Legend wrapperStyle={{ color:'var(--text-secondary)', fontSize:12 }} />
             <Line type="monotone" dataKey="value" stroke={lineColor} strokeWidth={2.5} dot={false} name="포트폴리오" />
-            <Line type="monotone" dataKey="benchmark" stroke="#10b981" strokeWidth={1.5} dot={false} name="벤치마크" strokeDasharray="5 4" />
+            <Line type="monotone" dataKey="benchmark" stroke="var(--brand-blue)" strokeWidth={1.5} dot={false} name="벤치마크" strokeDasharray="5 4" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -153,14 +153,14 @@ function PortfolioDetailChart({
           <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>보유 종목별 수익률</p>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={holdings} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
-              <XAxis type="number" tick={{ fill:'#475569', fontSize:10 }} tickFormatter={v=>`${v}%`} />
-              <YAxis dataKey="asset" type="category" tick={{ fill:'#94a3b8', fontSize:10 }} width={90} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+              <XAxis type="number" tick={{ fill:'var(--text-muted)', fontSize:10 }} tickFormatter={v=>`${v}%`} />
+              <YAxis dataKey="asset" type="category" tick={{ fill:'var(--text-secondary)', fontSize:10 }} width={90} />
               <Tooltip contentStyle={pfTooltipStyle} formatter={(v: any) => [`${v > 0 ? '+' : ''}${v}%`, '수익률']} cursor={false} />
               <Bar dataKey="returnRate" isAnimationActive={false} activeBar={false}
                 shape={(props:any) => (
                   <rect x={props.x} y={props.y} width={Math.abs(props.width)} height={props.height}
-                    fill={props.value >= 0 ? '#ef4444' : '#3b82f6'} rx={4}
+                    fill={props.value >= 0 ? 'var(--success)' : 'var(--danger)'} rx={4}
                     transform={props.value < 0 ? `translate(${props.width},0)` : undefined}
                   />
                 )}
@@ -180,12 +180,12 @@ function PortfolioDetailChart({
               const catColor = CAT_COLORS[h.category] ?? '#64748b';
               return (
                 <div key={i} style={{
-                  background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.07)',
+                  background:'var(--bg-secondary)', border:'1px solid var(--border)',
                   borderRadius:14, padding:'16px 18px',
                   borderLeft: `3px solid ${catColor}`,
                 }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-                    <span style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.9)' }}>{h.asset}</span>
+                    <span style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)' }}>{h.asset}</span>
                     <span style={{
                       fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:6,
                       background: `${catColor}22`, color: catColor
@@ -193,16 +193,16 @@ function PortfolioDetailChart({
                   </div>
                   <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
                     <div>
-                      <p style={{ fontSize:10, color:'rgba(255,255,255,0.35)', marginBottom:2 }}>평가금액</p>
-                      <p style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.85)' }}>{fmtPfMoney(h.value)}</p>
+                      <p style={{ fontSize:10, color:'var(--text-muted)', marginBottom:2 }}>평가금액</p>
+                      <p style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)' }}>{fmtPfMoney(h.value)}</p>
                     </div>
                     <div>
-                      <p style={{ fontSize:10, color:'rgba(255,255,255,0.35)', marginBottom:2 }}>비중</p>
-                      <p style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.85)' }}>{h.weight}%</p>
+                      <p style={{ fontSize:10, color:'var(--text-muted)', marginBottom:2 }}>비중</p>
+                      <p style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)' }}>{h.weight}%</p>
                     </div>
                     <div style={{ gridColumn:'1/-1' }}>
-                      <p style={{ fontSize:10, color:'rgba(255,255,255,0.35)', marginBottom:2 }}>수익률</p>
-                      <p style={{ fontSize:15, fontWeight:800, color: isHUp ? '#ef4444' : '#3b82f6' }}>
+                      <p style={{ fontSize:10, color:'var(--text-muted)', marginBottom:2 }}>수익률</p>
+                      <p style={{ fontSize:15, fontWeight:800, color: isHUp ? 'var(--success)' : 'var(--danger)' }}>
                         {isHUp ? '+' : ''}{h.returnRate}%
                       </p>
                     </div>
@@ -242,17 +242,17 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
 
   return (
     <div onClick={onClick} style={{
-      background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.07)',
+      background:'var(--bg-secondary)', border:'1px solid var(--border)',
       borderRadius:12, padding:'14px 16px', position:'relative',
       zIndex: showTip ? 50 : 1, transition: 'background 0.2s, z-index 0s',
       cursor: onClick ? 'pointer' : 'default'
     }}
-    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
-    onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-card-hover)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--bg-secondary)'; }}
     >
       {/* 라벨 행: 라벨 왼쪽 / ⓘ+뱃지 오른쪽 */}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
-        <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)', fontWeight:600 }}>{label}</span>
+        <span style={{ fontSize:11, color:'var(--text-secondary)', fontWeight:600 }}>{label}</span>
         <div style={{ display:'flex', alignItems:'center', gap:6 }}>
           {/* 뱃지 */}
           {hint !== '-' && (
@@ -269,8 +269,8 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
               <span style={{
                 display:'flex', alignItems:'center', justifyContent:'center',
                 width:16, height:16, borderRadius:'50%',
-                border:'1px solid rgba(255,255,255,0.22)', fontSize:10,
-                color:'rgba(255,255,255,0.4)', fontWeight:700,
+                border:'1px solid var(--border-light)', fontSize:10,
+                color:'var(--text-muted)', fontWeight:700,
                 userSelect:'none',
               }}>i</span>
               {showTip && (
@@ -278,10 +278,10 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
                   position:'absolute', 
                   ...(tipPos === 'top' ? { bottom:'calc(100% + 8px)' } : { top:'calc(100% + 8px)' }),
                   right:-8, width: 220,
-                  background:'rgba(10,14,26,0.97)', border:'1px solid rgba(255,255,255,0.12)',
+                  background:'#FFFFFF', border:'1px solid var(--border)',
                   borderRadius:8, padding:'10px 14px', whiteSpace:'normal', wordBreak:'keep-all',
-                  fontSize:12, color:'rgba(255,255,255,0.85)', zIndex:999,
-                  boxShadow:'0 10px 30px rgba(0,0,0,0.6)',
+                  fontSize:12, color:'var(--text-primary)', zIndex:999,
+                  boxShadow:'var(--shadow-card)',
                   pointerEvents:'none', lineHeight:1.45
                 }}>
                   {desc}
@@ -290,7 +290,7 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
                     ...(tipPos === 'top' ? { top:'100%' } : { bottom:'100%' }),
                     right:10, width:0, height:0,
                     borderLeft:'6px solid transparent', borderRight:'6px solid transparent',
-                    [tipPos === 'top' ? 'borderTop' : 'borderBottom']:'6px solid rgba(255,255,255,0.12)',
+                    [tipPos === 'top' ? 'borderTop' : 'borderBottom']:'6px solid var(--border)',
                   }} />
                 </div>
               )}
@@ -300,12 +300,12 @@ function MetricCard({ label, value, unit, hint, hintColor, desc, sparkData, onCl
       </div>
       {/* 값 & 미니 그래프 */}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end' }}>
-        <p style={{ fontSize:18, fontWeight:800, color:'rgba(255,255,255,0.9)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', paddingRight:8 }}>
-          {value}<span style={{ fontSize:11, color:'rgba(255,255,255,0.35)', marginLeft:2 }}>{unit}</span>
+        <p style={{ fontSize:18, fontWeight:800, color:'var(--text-primary)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', paddingRight:8 }}>
+          {value}<span style={{ fontSize:11, color:'var(--text-muted)', marginLeft:2 }}>{unit}</span>
         </p>
         {sparkData && sparkData.length > 0 && value !== '-' && (
           <div style={{ width: 64, height: 28, opacity: 0.85, flexShrink: 0 }}>
-            <Sparkline data={sparkData} color={hintColor !== '#94a3b8' && hintColor !== '-' ? hintColor : '#8b5cf6'} width="100%" height="100%" />
+            <Sparkline data={sparkData} color={hintColor !== '#94a3b8' && hintColor !== '-' ? hintColor : 'var(--brand-blue)'} width="100%" height="100%" />
           </div>
         )}
       </div>
@@ -318,18 +318,18 @@ function HoldingsBarChart({ holdings, tooltipStyle }: { holdings: {name:string;w
   return (
     <ResponsiveContainer width="100%" height={280}>
       <BarChart data={holdings} layout="vertical">
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
-        <XAxis type="number" tick={{ fill:'#475569', fontSize:11 }} />
-        <YAxis dataKey="name" type="category" tick={{ fill:'#94a3b8', fontSize:11 }} width={100} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+        <XAxis type="number" tick={{ fill:'var(--text-muted)', fontSize:11 }} />
+        <YAxis dataKey="name" type="category" tick={{ fill:'var(--text-secondary)', fontSize:11 }} width={100} />
         <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`, '비중']} cursor={false} />
         <Bar
           dataKey="weight"
-          fill="#8b5cf6"
+          fill="var(--brand-blue)"
           radius={[0,4,4,0]}
           isAnimationActive={false}
           activeBar={false}
           shape={(props: any) => (
-            <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#8b5cf6" rx={4} />
+            <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="var(--brand-blue)" rx={4} />
           )}
         />
       </BarChart>
@@ -337,7 +337,7 @@ function HoldingsBarChart({ holdings, tooltipStyle }: { holdings: {name:string;w
   );
 }
 
-const COLORS = ['#6366f1','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444','#ec4899','#14b8a6','#a855f7','#0ea5e9'];
+const COLORS = ['var(--accent)','var(--brand-blue)','#06b6d4','var(--brand-green-dark)','#f59e0b','var(--danger)','#14b8a6','#0ea5e9'];
 
 const tooltipStyle = {
   backgroundColor: '#141b2d',
@@ -430,14 +430,14 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     };
 
     const metricCards = [
-      { label:'PER', value: m.peRatio?.toFixed(1) ?? '-', unit:'배', desc:'주가가 회사의 1년 순이익의 몇 배인지 나타냅니다. 낮을수록 저평가되어 있습니다.', hint: m.peRatio ? (m.peRatio < 15 ? '저평가' : m.peRatio < 25 ? '적정' : '고평가') : '-', hintColor: m.peRatio ? (m.peRatio < 15 ? '#10b981' : m.peRatio < 25 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.peRatio, m.peRatio && m.peRatio < 15 ? 'down' : 'flat') },
-      { label:'PBR', value: m.pbr?.toFixed(2) ?? '-', unit:'배', desc:'회사의 순자산(가진 돈) 대비 주가가 몇 배인지 나타냅니다. 1 미만이면 회사를 다 팔아도 남는 장사라는 뜻입니다.', hint: m.pbr ? (m.pbr < 1 ? '저평가' : m.pbr < 2 ? '적정' : '고평가') : '-', hintColor: m.pbr ? (m.pbr < 1 ? '#10b981' : m.pbr < 2 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.pbr, 'flat') },
-      { label:'ROE', value: m.roe?.toFixed(1) ?? '-', unit:'%', desc:'주주의 돈(자본)을 굴려서 1년에 몇 %의 수익을 냈는지 보여줍니다. 높을수록 장사를 잘하는 곳입니다.', hint: m.roe ? (m.roe >= 15 ? '우수' : m.roe >= 8 ? '양호' : '주의') : '-', hintColor: m.roe ? (m.roe >= 15 ? '#10b981' : m.roe >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roe, m.roe && m.roe >= 15 ? 'up' : 'flat') },
-      { label:'ROA', value: m.roa?.toFixed(1) ?? '-', unit:'%', desc:'회사가 가진 모든 자산(빚 포함)을 활용해 얼만큼의 수익을 냈는지 보여줍니다.', hint: m.roa ? (m.roa >= 8 ? '우수' : m.roa >= 4 ? '양호' : '주의') : '-', hintColor: m.roa ? (m.roa >= 8 ? '#10b981' : m.roa >= 4 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.roa, 'flat') },
-      { label:'영업이익률', value: m.operatingMargin?.toFixed(1) ?? '-', unit:'%', desc:'물건을 팔고 남은 순수한 장사 이윤이 몇 %인지 나타냅니다.', hint: m.operatingMargin ? (m.operatingMargin >= 15 ? '우수' : m.operatingMargin >= 8 ? '양호' : '주의') : '-', hintColor: m.operatingMargin ? (m.operatingMargin >= 15 ? '#10b981' : m.operatingMargin >= 8 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.operatingMargin, 'up') },
+      { label:'PER', value: m.peRatio?.toFixed(1) ?? '-', unit:'배', desc:'주가가 회사의 1년 순이익의 몇 배인지 나타냅니다. 낮을수록 저평가되어 있습니다.', hint: m.peRatio ? (m.peRatio < 15 ? '저평가' : m.peRatio < 25 ? '적정' : '고평가') : '-', hintColor: m.peRatio ? (m.peRatio < 15 ? 'var(--success)' : m.peRatio < 25 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.peRatio, m.peRatio && m.peRatio < 15 ? 'down' : 'flat') },
+      { label:'PBR', value: m.pbr?.toFixed(2) ?? '-', unit:'배', desc:'회사의 순자산(가진 돈) 대비 주가가 몇 배인지 나타냅니다. 1 미만이면 회사를 다 팔아도 남는 장사라는 뜻입니다.', hint: m.pbr ? (m.pbr < 1 ? '저평가' : m.pbr < 2 ? '적정' : '고평가') : '-', hintColor: m.pbr ? (m.pbr < 1 ? 'var(--success)' : m.pbr < 2 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.pbr, 'flat') },
+      { label:'ROE', value: m.roe?.toFixed(1) ?? '-', unit:'%', desc:'주주의 돈(자본)을 굴려서 1년에 몇 %의 수익을 냈는지 보여줍니다. 높을수록 장사를 잘하는 곳입니다.', hint: m.roe ? (m.roe >= 15 ? '우수' : m.roe >= 8 ? '양호' : '주의') : '-', hintColor: m.roe ? (m.roe >= 15 ? 'var(--success)' : m.roe >= 8 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.roe, m.roe && m.roe >= 15 ? 'up' : 'flat') },
+      { label:'ROA', value: m.roa?.toFixed(1) ?? '-', unit:'%', desc:'회사가 가진 모든 자산(빚 포함)을 활용해 얼만큼의 수익을 냈는지 보여줍니다.', hint: m.roa ? (m.roa >= 8 ? '우수' : m.roa >= 4 ? '양호' : '주의') : '-', hintColor: m.roa ? (m.roa >= 8 ? 'var(--success)' : m.roa >= 4 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.roa, 'flat') },
+      { label:'영업이익률', value: m.operatingMargin?.toFixed(1) ?? '-', unit:'%', desc:'물건을 팔고 남은 순수한 장사 이윤이 몇 %인지 나타냅니다.', hint: m.operatingMargin ? (m.operatingMargin >= 15 ? '우수' : m.operatingMargin >= 8 ? '양호' : '주의') : '-', hintColor: m.operatingMargin ? (m.operatingMargin >= 15 ? 'var(--success)' : m.operatingMargin >= 8 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.operatingMargin, 'up') },
       { label:'순이익률', value: m.netMargin?.toFixed(1) ?? '-', unit:'%', desc:'모든 비용과 세금까지 다 떼고 최종적으로 회사 주머니에 남은 수익 비율입니다.', hint: '-', hintColor: '#94a3b8', sparkData: genSpark(m.netMargin, 'up') },
-      { label:'부채비율', value: m.debtRatio?.toFixed(0) ?? '-', unit:'%', desc:'내 돈(자본) 대비 남의 돈(빚)이 얼마나 되는지 나타냅니다. 낮을수록 안전합니다.', hint: m.debtRatio ? (m.debtRatio < 50 ? '안정' : m.debtRatio < 100 ? '양호' : '주의') : '-', hintColor: m.debtRatio ? (m.debtRatio < 50 ? '#10b981' : m.debtRatio < 100 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.debtRatio, m.debtRatio && m.debtRatio > 100 ? 'up' : 'down') },
-      { label:'매출성장률', value: m.revenueGrowth?.toFixed(1) ?? '-', unit:'%', desc:'작년보다 물건을 얼마나 더 많이 팔았는지 나타냅니다.', hint: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '고성장' : m.revenueGrowth >= 0 ? '성장' : '역성장') : '-', hintColor: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '#10b981' : m.revenueGrowth >= 0 ? '#f59e0b' : '#ef4444') : '#94a3b8', sparkData: genSpark(m.revenueGrowth, 'flat') },
+      { label:'부채비율', value: m.debtRatio?.toFixed(0) ?? '-', unit:'%', desc:'내 돈(자본) 대비 남의 돈(빚)이 얼마나 되는지 나타냅니다. 낮을수록 안전합니다.', hint: m.debtRatio ? (m.debtRatio < 50 ? '안정' : m.debtRatio < 100 ? '양호' : '주의') : '-', hintColor: m.debtRatio ? (m.debtRatio < 50 ? 'var(--success)' : m.debtRatio < 100 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.debtRatio, m.debtRatio && m.debtRatio > 100 ? 'up' : 'down') },
+      { label:'매출성장률', value: m.revenueGrowth?.toFixed(1) ?? '-', unit:'%', desc:'작년보다 물건을 얼마나 더 많이 팔았는지 나타냅니다.', hint: m.revenueGrowth ? (m.revenueGrowth >= 10 ? '고성장' : m.revenueGrowth >= 0 ? '성장' : '역성장') : '-', hintColor: m.revenueGrowth ? (m.revenueGrowth >= 10 ? 'var(--success)' : m.revenueGrowth >= 0 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)', sparkData: genSpark(m.revenueGrowth, 'flat') },
       { label:'EPS', value: m.eps ? `₩${(+m.eps).toLocaleString()}` : '-', unit:'', desc:'주식 1주가 1년 동안 벌어들인 순이익입니다. 꾸준히 우상향하는 회사가 좋습니다.', hint: '-', hintColor: '#94a3b8', sparkData: epsHistory.map(h => h.eps) },
       { label:'배당수익률', value: m.dividendYield?.toFixed(2) ?? '-', unit:'%', desc:'지금 주식 1주를 사면 1년에 배당금으로 몇 %를 받을 수 있는지 나타냅니다.', hint: m.dividendYield ? (m.dividendYield >= 3 ? '고배당' : m.dividendYield >= 1 ? '배당주' : '저배당') : '-', hintColor: '#94a3b8', sparkData: genSpark(m.dividendYield, 'flat') },
     ];
@@ -522,10 +522,10 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>재무 역량 레이더</p>
               <ResponsiveContainer width="100%" height={280}>
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="rgba(255,255,255,0.07)" />
-                  <PolarAngleAxis dataKey="metric" tick={{ fill:'#94a3b8', fontSize:10 }} />
-                  <PolarRadiusAxis angle={30} domain={[0,100]} tick={{ fill:'#475569', fontSize:9 }} />
-                  <Radar name="재무지표" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+                  <PolarGrid stroke="var(--border)" />
+                  <PolarAngleAxis dataKey="metric" tick={{ fill:'var(--text-secondary)', fontSize:10 }} />
+                  <PolarRadiusAxis angle={30} domain={[0,100]} tick={{ fill:'var(--text-muted)', fontSize:9 }} />
+                  <Radar name="재무지표" dataKey="value" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.3} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v.toFixed(0)}점`, '스코어']} />
                 </RadarChart>
               </ResponsiveContainer>
@@ -534,12 +534,12 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>연도별 EPS 추이</p>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={epsHistory}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                  <XAxis dataKey="year" tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`₩${(v/1000).toFixed(0)}k`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="year" tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`₩${(v/1000).toFixed(0)}k`} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v.toLocaleString()}`, 'EPS']} cursor={false} />
-                  <Bar dataKey="eps" fill="#8b5cf6" radius={[6,6,0,0]} isAnimationActive={false} activeBar={false}
-                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#8b5cf6" rx={6} />}
+                  <Bar dataKey="eps" fill="var(--brand-blue)" radius={[6,6,0,0]} isAnimationActive={false} activeBar={false}
+                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="var(--brand-blue)" rx={6} />}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -552,16 +552,16 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color:'var(--text-secondary)' }}>분기별 매출 & 영업이익</p>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={quarterly}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                  <XAxis dataKey="period" tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`${(v/1e6).toFixed(0)}M`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="period" tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} tickFormatter={v=>`${(v/1e6).toFixed(0)}M`} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any, n: any) => [`₩${v.toLocaleString()}`, n==='revenue'?'매출':'영업이익']} cursor={false} />
-                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-                  <Bar dataKey="revenue" fill="#6366f1" radius={[4,4,0,0]} name="매출" isAnimationActive={false} activeBar={false}
-                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#6366f1" rx={4} />}
+                  <Legend wrapperStyle={{ color:'var(--text-secondary)', fontSize:12 }} />
+                  <Bar dataKey="revenue" fill="var(--accent)" radius={[4,4,0,0]} name="매출" isAnimationActive={false} activeBar={false}
+                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="var(--accent)" rx={4} />}
                   />
-                  <Bar dataKey="operatingProfit" fill="#10b981" radius={[4,4,0,0]} name="영업이익" isAnimationActive={false} activeBar={false}
-                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="#10b981" rx={4} />}
+                  <Bar dataKey="operatingProfit" fill="var(--success)" radius={[4,4,0,0]} name="영업이익" isAnimationActive={false} activeBar={false}
+                    shape={(props:any) => <rect x={props.x} y={props.y} width={props.width} height={props.height} fill="var(--success)" rx={4} />}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -600,15 +600,15 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                     <AreaChart data={history}>
                       <defs>
                         <linearGradient id="mktGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          <stop offset="5%" stopColor="var(--success)" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="var(--success)" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                      <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                      <YAxis domain={['auto','auto']} tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} />
                       <Tooltip contentStyle={tooltipStyle} />
-                      <Area type="monotone" dataKey="value" stroke="#10b981" fill="url(#mktGrad)" strokeWidth={2} dot={false} />
+                      <Area type="monotone" dataKey="value" stroke="var(--success)" fill="url(#mktGrad)" strokeWidth={2} dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -618,12 +618,12 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>섹터별 등락률</p>
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={sectors} layout="vertical" margin={{ left: 0, right: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" horizontal={false} />
-                      <XAxis type="number" tick={{ fill:'#475569', fontSize:11 }} tickFormatter={v=>`${v > 0 ? '+' : ''}${v}%`} />
-                      <YAxis dataKey="sector" type="category" tick={{ fill:'#94a3b8', fontSize:11 }} width={72} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                      <XAxis type="number" tick={{ fill:'var(--text-muted)', fontSize:11 }} tickFormatter={v=>`${v > 0 ? '+' : ''}${v}%`} />
+                      <YAxis dataKey="sector" type="category" tick={{ fill:'var(--text-secondary)', fontSize:11 }} width={72} />
                       <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v > 0 ? '+' : ''}${v}%`,'등락률']} />
                       <Bar dataKey="changePercent" radius={[0,4,4,0]} maxBarSize={20}>
-                        {sectors.map((s,i) => <Cell key={i} fill={s.changePercent >= 0 ? '#10b981' : '#ef4444'} />)}
+                        {sectors.map((s,i) => <Cell key={i} fill={s.changePercent >= 0 ? 'var(--success)' : 'var(--danger)'} />)}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
@@ -634,34 +634,34 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
           {(breadthTotal > 0 || addl.fearGreedIndex != null) && (
             <div style={{ display: 'grid', gridTemplateColumns: breadthTotal > 0 && addl.fearGreedIndex != null ? '1fr 1fr' : '1fr', gap: 16 }}>
               {breadthTotal > 0 && (
-                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: '20px 24px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 14, letterSpacing: '0.05em' }}>시장 폭 (Market Breadth)</p>
+                <div style={{ background: 'var(--bg-secondary)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border)' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 14, letterSpacing: '0.05em' }}>시장 폭 (Market Breadth)</p>
                   <div style={{ display: 'flex', height: 10, borderRadius: 5, overflow: 'hidden', marginBottom: 10 }}>
-                    <div style={{ width: `${((breadth.advancing ?? 0)/breadthTotal)*100}%`, background: '#10b981', transition: 'width 0.5s' }} />
+                    <div style={{ width: `${((breadth.advancing ?? 0)/breadthTotal)*100}%`, background: 'var(--success)', transition: 'width 0.5s' }} />
                     <div style={{ width: `${((breadth.unchanged ?? 0)/breadthTotal)*100}%`, background: '#475569' }} />
-                    <div style={{ width: `${((breadth.declining ?? 0)/breadthTotal)*100}%`, background: '#ef4444' }} />
+                    <div style={{ width: `${((breadth.declining ?? 0)/breadthTotal)*100}%`, background: 'var(--danger)' }} />
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>
-                    <span style={{ color: '#10b981', fontWeight: 700 }}>↑ 상승 {breadth.advancing ?? '-'}종목</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-secondary)' }}>
+                    <span style={{ color: 'var(--brand-green-dark)', fontWeight: 700 }}>↑ 상승 {breadth.advancing ?? '-'}종목</span>
                     <span>변동없음 {breadth.unchanged ?? '-'}</span>
-                    <span style={{ color: '#ef4444', fontWeight: 700 }}>↓ 하락 {breadth.declining ?? '-'}종목</span>
+                    <span style={{ color: 'var(--danger)', fontWeight: 700 }}>↓ 하락 {breadth.declining ?? '-'}종목</span>
                   </div>
                 </div>
               )}
               {addl.fearGreedIndex != null && (() => {
                 const fg = addl.fearGreedIndex;
-                const fgColor = fg < 25 ? '#ef4444' : fg < 45 ? '#f59e0b' : fg < 55 ? '#94a3b8' : fg < 75 ? '#10b981' : '#06b6d4';
+                const fgColor = fg < 25 ? 'var(--danger)' : fg < 45 ? 'var(--warning)' : fg < 55 ? 'var(--text-muted)' : fg < 75 ? 'var(--success)' : 'var(--brand-blue)';
                 const fgLabel = fg < 25 ? '극도의 공포' : fg < 45 ? '공포' : fg < 55 ? '중립' : fg < 75 ? '탐욕' : '극도의 탐욕';
                 return (
-                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: 14, padding: '20px 24px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 14, letterSpacing: '0.05em' }}>공포·탐욕 지수 (Fear & Greed)</p>
+                  <div style={{ background: 'var(--bg-secondary)', borderRadius: 14, padding: '20px 24px', border: '1px solid var(--border)' }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 14, letterSpacing: '0.05em' }}>공포·탐욕 지수 (Fear & Greed)</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                       <div style={{ width: 72, height: 72, borderRadius: '50%', border: `4px solid ${fgColor}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         <span style={{ fontSize: 22, fontWeight: 800, color: fgColor }}>{fg}</span>
                       </div>
                       <div>
                         <p style={{ fontSize: 16, fontWeight: 700, color: fgColor, marginBottom: 4 }}>{fgLabel}</p>
-                        {addl.putCallRatio != null && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Put/Call Ratio: <strong style={{color:'rgba(255,255,255,0.7)'}}>{addl.putCallRatio}</strong></p>}
+                        {addl.putCallRatio != null && <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>Put/Call Ratio: <strong style={{color:'var(--text-primary)'}}>{addl.putCallRatio}</strong></p>}
                       </div>
                     </div>
                   </div>
@@ -699,9 +699,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 곡선</p>
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart data={curve}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                      <XAxis dataKey="maturity" tick={{ fill:'#475569', fontSize:11 }} />
-                      <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="maturity" tick={{ fill:'var(--text-muted)', fontSize:11 }} />
+                      <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
                       <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${v}%`,'금리']} />
                       <Line type="monotone" dataKey="yield" stroke="#84cc16" strokeWidth={2} dot={{ fill:'#84cc16', r:4 }} />
                     </LineChart>
@@ -713,9 +713,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                   <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>수익률 추이</p>
                   <ResponsiveContainer width="100%" height={280}>
                     <LineChart data={hist}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                      <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} domain={['auto','auto']} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                      <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} domain={['auto','auto']} />
                       <Tooltip contentStyle={tooltipStyle} />
                       <Line type="monotone" dataKey="yield" stroke="#eab308" strokeWidth={2} dot={false} />
                     </LineChart>
@@ -736,22 +736,22 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     case 'crypto': {
       const key = data.category === 'crypto' ? 'priceHistory' : data.category === 'forex' ? 'history' : 'priceHistory';
       const priceKey = data.category === 'forex' ? 'rate' : 'price';
-      const color = data.category === 'crypto' ? '#ef4444' : data.category === 'forex' ? '#f97316' : '#eab308';
+      const color = data.category === 'crypto' ? 'var(--danger)' : data.category === 'forex' ? '#f97316' : '#eab308';
       const history = ((d[key] as Record<string,number>[] | undefined) ?? []).slice(-90);
       
       const metrics = data.category === 'crypto' ? [
         { label: '현재가', value: d.currentPrice?.toLocaleString() ?? '-', unit: '$', desc: '현재 거래 가격입니다.', sparkData: history.map(h => h.price) },
         { label: '시가총액', value: d.marketCap ? (d.marketCap/1e9).toFixed(2) : '-', unit: 'B', desc: '총 발행량에 현재가를 곱한 값입니다.' },
         { label: '24시간 거래량', value: d.volume24h ? (d.volume24h/1e6).toFixed(2) : '-', unit: 'M', desc: '최근 24시간 동안의 거래 규모입니다.' },
-        { label: '24시간 변동률', value: d.change24h?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 가격 변동률입니다.', hint: d.change24h ? (d.change24h > 0 ? '상승' : '하락') : '-', hintColor: d.change24h ? (d.change24h > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+        { label: '24시간 변동률', value: d.change24h?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 가격 변동률입니다.', hint: d.change24h ? (d.change24h > 0 ? '상승' : '하락') : '-', hintColor: d.change24h ? (d.change24h > 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text-muted)' },
       ] : data.category === 'forex' ? [
         { label: '현재 환율', value: d.currentRate?.toLocaleString() ?? '-', unit: '', desc: '현재 적용되는 환율입니다.', sparkData: history.map(h => h.rate) },
-        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text-muted)' },
         { label: '매수호가(Bid)', value: d.bid?.toLocaleString() ?? '-', unit: '', desc: '시장에서 매수하려는 최고 가격입니다.' },
         { label: '매도호가(Ask)', value: d.ask?.toLocaleString() ?? '-', unit: '', desc: '시장에서 매도하려는 최저 가격입니다.' },
       ] : [
         { label: '현재가', value: d.currentPrice?.toLocaleString() ?? '-', unit: '$', desc: '원자재의 현재 가격입니다.', sparkData: history.map(h => h.price) },
-        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+        { label: '변동률', value: d.changePercent?.toFixed(2) ?? '-', unit: '%', desc: '전일 대비 변동률입니다.', hint: d.changePercent ? (d.changePercent > 0 ? '상승' : '하락') : '-', hintColor: d.changePercent ? (d.changePercent > 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text-muted)' },
       ];
 
       return (
@@ -775,9 +775,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                       <stop offset="95%" stopColor={color} stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                  <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                  <YAxis domain={['auto','auto']} tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Area type="monotone" dataKey={priceKey} stroke={color} fill="url(#genGrad)" strokeWidth={2} dot={false} />
                 </AreaChart>
@@ -814,13 +814,13 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>경제 지표 시계열 추이</p>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={hist}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} />
                   <Tooltip contentStyle={tooltipStyle} />
-                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-                  <Line type="monotone" dataKey="gdpGrowth" stroke="#6366f1" strokeWidth={2} dot={false} name="GDP성장률" />
-                  <Line type="monotone" dataKey="cpi" stroke="#ef4444" strokeWidth={2} dot={false} name="CPI" />
+                  <Legend wrapperStyle={{ color:'var(--text-secondary)', fontSize:12 }} />
+                  <Line type="monotone" dataKey="gdpGrowth" stroke="var(--accent)" strokeWidth={2} dot={false} name="GDP성장률" />
+                  <Line type="monotone" dataKey="cpi" stroke="var(--danger)" strokeWidth={2} dot={false} name="CPI" />
                   <Line type="monotone" dataKey="unemploymentRate" stroke="#f59e0b" strokeWidth={2} dot={false} name="실업률" />
                 </LineChart>
               </ResponsiveContainer>
@@ -846,7 +846,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
       const metrics = [
         { label: '총 매수금액', value: (totalBuy/10000).toFixed(0), unit: '만', desc: '기간 내 총 매수 금액입니다.' },
         { label: '총 매도금액', value: (totalSell/10000).toFixed(0), unit: '만', desc: '기간 내 총 매도 금액입니다.' },
-        { label: '순매수금액', value: ((totalBuy - totalSell)/10000).toFixed(0), unit: '만', desc: '매수 금액에서 매도 금액을 뺀 값입니다.', hint: totalBuy >= totalSell ? '순매수' : '순매도', hintColor: totalBuy >= totalSell ? '#10b981' : '#ef4444' },
+        { label: '순매수금액', value: ((totalBuy - totalSell)/10000).toFixed(0), unit: '만', desc: '매수 금액에서 매도 금액을 뺀 값입니다.', hint: totalBuy >= totalSell ? '순매수' : '순매도', hintColor: totalBuy >= totalSell ? 'var(--success)' : 'var(--danger)' },
       ];
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
@@ -863,13 +863,13 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>일별 매수/매도 금액</p>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>fmtNum(v,'₩')} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} tickFormatter={v=>fmtNum(v,'₩')} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any,n: any) => [fmtNum(v,'₩'), n==='buy'?'매수':'매도']} />
-                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-                  <Bar dataKey="buy" fill="#10b981" radius={[4,4,0,0]} name="매수" />
-                  <Bar dataKey="sell" fill="#ef4444" radius={[4,4,0,0]} name="매도" />
+                  <Legend wrapperStyle={{ color:'var(--text-secondary)', fontSize:12 }} />
+                  <Bar dataKey="buy" fill="var(--success)" radius={[4,4,0,0]} name="매수" />
+                  <Bar dataKey="sell" fill="var(--danger)" radius={[4,4,0,0]} name="매도" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -899,9 +899,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>배당금 이력</p>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={hist}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="exDate" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} />
-                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="exDate" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v}`, '배당금']} />
                   <Bar dataKey="amount" fill="#a855f7" radius={[4,4,0,0]} name="배당금" />
                 </BarChart>
@@ -937,13 +937,13 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
               <p className="text-sm font-medium mb-3" style={{ color: 'var(--text-secondary)' }}>옵션 내재 변동성 (IV) by 행사가</p>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chain}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="strike" tick={{ fill:'#475569', fontSize:11 }} />
-                  <YAxis tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="strike" tick={{ fill:'var(--text-muted)', fontSize:11 }} />
+                  <YAxis tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} tickFormatter={v=>`${v}%`} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any,n: any) => [`${v}%`, n]} />
-                  <Legend wrapperStyle={{ color:'#94a3b8', fontSize:12 }} />
-                  <Line type="monotone" dataKey="callIV" stroke="#10b981" strokeWidth={2} dot={{ r:3 }} name="콜 IV" />
-                  <Line type="monotone" dataKey="putIV" stroke="#ef4444" strokeWidth={2} dot={{ r:3 }} name="풋 IV" />
+                  <Legend wrapperStyle={{ color:'var(--text-secondary)', fontSize:12 }} />
+                  <Line type="monotone" dataKey="callIV" stroke="var(--success)" strokeWidth={2} dot={{ r:3 }} name="콜 IV" />
+                  <Line type="monotone" dataKey="putIV" stroke="var(--danger)" strokeWidth={2} dot={{ r:3 }} name="풋 IV" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -956,7 +956,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
       const navHist = ((d.navHistory as {date:string;nav:number}[] | undefined) ?? []).slice(-90);
       const metrics = [
         { label: '순자산가치(NAV)', value: d.nav?.toLocaleString() ?? '-', unit: '원', desc: '펀드의 1주당 순자산가치입니다.', sparkData: navHist.map(h => h.nav) },
-        { label: '총수익률', value: d.totalReturn?.toFixed(2) ?? '-', unit: '%', desc: '설정 이후 또는 특정 기간 동안의 총 수익률입니다.', hint: d.totalReturn ? (d.totalReturn > 0 ? '수익' : '손실') : '-', hintColor: d.totalReturn ? (d.totalReturn > 0 ? '#10b981' : '#ef4444') : '#94a3b8' },
+        { label: '총수익률', value: d.totalReturn?.toFixed(2) ?? '-', unit: '%', desc: '설정 이후 또는 특정 기간 동안의 총 수익률입니다.', hint: d.totalReturn ? (d.totalReturn > 0 ? '수익' : '손실') : '-', hintColor: d.totalReturn ? (d.totalReturn > 0 ? 'var(--success)' : 'var(--danger)') : 'var(--text-muted)' },
       ];
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
@@ -979,9 +979,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                       <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                  <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} tickFormatter={v=>`₩${v.toLocaleString()}`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                  <YAxis domain={['auto','auto']} tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} tickFormatter={v=>`₩${v.toLocaleString()}`} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`₩${v.toLocaleString()}`, 'NAV']} />
                   <Area type="monotone" dataKey="nav" stroke="#0ea5e9" fill="url(#fundGrad)" strokeWidth={2} dot={false} />
                 </AreaChart>
@@ -1025,9 +1025,9 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
                           <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
-                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'#475569', fontSize:11 }} tickLine={false} />
-                      <YAxis domain={['auto','auto']} tick={{ fill:'#475569', fontSize:11 }} axisLine={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                      <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fill:'var(--text-muted)', fontSize:11 }} tickLine={false} />
+                      <YAxis domain={['auto','auto']} tick={{ fill:'var(--text-muted)', fontSize:11 }} axisLine={false} />
                       <Tooltip contentStyle={tooltipStyle} />
                       <Area type="monotone" dataKey="price" stroke="#22c55e" fill="url(#reitGrad)" strokeWidth={2} dot={false} />
                     </AreaChart>
@@ -1080,7 +1080,7 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
     default:
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'rgba(255,255,255,0.4)', fontSize: '13px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '13px' }}>
             <span>ℹ️</span>
             <span>이 데이터에 최적화된 전용 차트가 아직 준비되지 않아 상세 표 형태로 표시합니다.</span>
           </div>
@@ -1122,9 +1122,9 @@ function DraggableMetricWindow({ win, onClose, onFocus, onMove }: {
     <div 
       style={{
         position:'fixed', left: win.x, top: win.y, zIndex: win.zIndex,
-        width: 440, background:'rgba(15,23,42,0.92)', border:'1px solid rgba(255,255,255,0.15)',
-        borderRadius:16, padding:20, boxShadow:'0 10px 30px rgba(0,0,0,0.5)',
-        backdropFilter:'blur(10px)', pointerEvents:'auto'
+        width: 440, background:'#FFFFFF', border:'1px solid var(--border)',
+        borderRadius:16, padding:20, boxShadow:'var(--shadow-card)',
+        pointerEvents:'auto'
       }}
       onMouseDown={onFocus}
     >
@@ -1132,38 +1132,38 @@ function DraggableMetricWindow({ win, onClose, onFocus, onMove }: {
         onMouseDown={onMouseDown}
         style={{ 
           display:'flex', justifyContent:'space-between', alignItems:'flex-start', 
-          marginBottom:16, cursor:'move', paddingBottom:10, borderBottom:'1px solid rgba(255,255,255,0.05)' 
+          marginBottom:16, cursor:'move', paddingBottom:10, borderBottom:'1px solid var(--border)' 
         }}
       >
         <div>
-          <h3 style={{ fontSize:18, fontWeight:800, color:'white', marginBottom:4 }}>
+          <h3 style={{ fontSize:18, fontWeight:800, color:'var(--text-primary)', marginBottom:4 }}>
             {win.label} 추이
-            <span style={{ fontSize:14, fontWeight:700, color:win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : 'white', marginLeft: 10 }}>
+            <span style={{ fontSize:14, fontWeight:700, color:win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : 'var(--text-primary)', marginLeft: 10 }}>
               {win.value}{win.unit}
             </span>
           </h3>
-          <p style={{ fontSize:11, color:'rgba(255,255,255,0.4)', lineHeight:1.3, maxWidth:340 }}>{win.desc}</p>
+          <p style={{ fontSize:11, color:'var(--text-secondary)', lineHeight:1.3, maxWidth:340 }}>{win.desc}</p>
         </div>
         <button 
           onClick={(e) => { e.stopPropagation(); onClose(); }} 
-          style={{ background:'transparent', border:'none', color:'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:18, padding:4 }}
+          style={{ background:'transparent', border:'none', color:'var(--text-muted)', cursor:'pointer', fontSize:18, padding:4 }}
         >✕</button>
       </div>
       
       <div style={{ height: 180, width: '100%', marginTop:10 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={win.sparkData.map((val:any, idx:number) => ({ val, period: `M-${idx+1}` }))} margin={{ top:5, right:5, bottom:0, left:-20 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-            <XAxis dataKey="period" tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+            <XAxis dataKey="period" tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} domain={['dataMin - 1', 'dataMax + 1']} />
             <Tooltip 
-              contentStyle={{ background:'rgba(10,14,26,0.95)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:8, fontSize: 11 }}
+              contentStyle={{ background:'#FFFFFF', border:'1px solid var(--border)', borderRadius:8, fontSize: 11 }}
               formatter={(v: any) => [v.toFixed(2), win.label]}
             />
             <Area 
               type="monotone" dataKey="val" 
-              stroke={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : '#8b5cf6'} 
-              fill={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : '#8b5cf6'} 
+              stroke={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : 'var(--brand-blue)'} 
+              fill={win.hintColor !== '#94a3b8' && win.hintColor !== '-' ? win.hintColor : 'var(--brand-blue)'} 
               fillOpacity={0.2} strokeWidth={2.5} 
               activeDot={{ r: 4, strokeWidth: 0 }}
             />
@@ -1181,8 +1181,8 @@ function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) 
   return (
     <div style={{
       gridColumn: colSpan,
-      background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--surface-raised)',
+      border: '1px solid var(--border)',
       borderRadius: '16px',
       padding: '20px',
       display: 'flex',
@@ -1191,9 +1191,9 @@ function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) 
     }}>
       {block.title && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{block.title}</h3>
+          <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>{block.title}</h3>
           {block.description && (
-             <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{block.description}</div>
+             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{block.description}</div>
           )}
         </div>
       )}
@@ -1207,10 +1207,10 @@ function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) 
 
 function renderBlockContent(block: any, openWindow: (m: any) => void) {
   const tooltipStyle = {
-    background: 'rgba(10, 14, 26, 0.95)',
-    border: '1px solid rgba(255,255,255,0.15)',
+    background: '#FFFFFF',
+    border: '1px solid var(--border)',
     borderRadius: '10px',
-    color: '#fff',
+    color: '#1A1A1A',
     fontSize: '12px',
   };
 
@@ -1258,19 +1258,19 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
         <ResponsiveContainer width="100%" height={220}>
           {chartType === 'line' ? (
             <LineChart data={block.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey={xKey} tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey={yKey} stroke="#6366f1" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey={yKey} stroke="var(--accent)" strokeWidth={2} dot={false} />
             </LineChart>
           ) : chartType === 'bar' ? (
             <BarChart data={block.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-              <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey={xKey} tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey={yKey} fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey={yKey} fill="var(--brand-blue)" radius={[4, 4, 0, 0]} />
             </BarChart>
           ) : chartType === 'pie' ? (
             <PieChart>
@@ -1291,11 +1291,11 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
             </PieChart>
           ) : (
             <AreaChart data={block.data}>
-               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-               <XAxis dataKey={xKey} tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} />
-               <YAxis tick={{ fill:'#475569', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
+               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+               <XAxis dataKey={xKey} tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} />
+               <YAxis tick={{ fill:'var(--text-muted)', fontSize:10 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
                <Tooltip contentStyle={tooltipStyle} />
-               <Area type="monotone" dataKey={yKey} stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
+               <Area type="monotone" dataKey={yKey} stroke="var(--success)" fill="var(--success)" fillOpacity={0.1} strokeWidth={2} />
             </AreaChart>
           )}
         </ResponsiveContainer>
@@ -1305,9 +1305,9 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
       return (
         <ResponsiveContainer width="100%" height={220}>
           <RadarChart data={block.data}>
-            <PolarGrid stroke="rgba(255,255,255,0.07)" />
-            <PolarAngleAxis dataKey="metric" tick={{ fill:'#94a3b8', fontSize:10 }} />
-            <Radar name="Score" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.3} />
+            <PolarGrid stroke="var(--border)" />
+            <PolarAngleAxis dataKey="metric" tick={{ fill:'var(--text-secondary)', fontSize:10 }} />
+            <Radar name="Score" dataKey="value" stroke="var(--accent)" fill="var(--accent)" fillOpacity={0.3} />
             <Tooltip contentStyle={tooltipStyle} />
           </RadarChart>
         </ResponsiveContainer>
@@ -1317,10 +1317,10 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {block.data.map((item: any, i: number) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px' }}>
-              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>{i+1}</div>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px', background: 'var(--bg-secondary)', borderRadius: '10px' }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#FFFFFF', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>{i+1}</div>
               <div style={{ flex: 1, fontSize: '13px', fontWeight: 600 }}>{item.name}</div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#6366f1' }}>{item.value}</div>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--accent)' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -1331,7 +1331,7 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
 
     default:
       return (
-        <div style={{ padding: '20px', textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: '12px' }}>
+        <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '12px' }}>
           지원하지 않는 시각화 조각입니다.
         </div>
       );
@@ -1345,18 +1345,18 @@ function TableView({ data }: { data: any }) {
   if (Array.isArray(data) && data.length > 0 && typeof data[0] === 'object') {
     const keys = Object.keys(data[0]);
     return (
-      <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>
+      <div style={{ overflowX: 'auto', borderRadius: '12px', border: '1px solid var(--border)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', color: 'var(--text-secondary)' }}>
           <thead>
-            <tr style={{ background: 'rgba(255,255,255,0.05)', textAlign: 'left' }}>
+            <tr style={{ background: 'var(--bg-secondary)', textAlign: 'left' }}>
               {keys.map(k => (
-                <th key={k} style={{ padding: '12px 16px', fontWeight: 700, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>{k}</th>
+                <th key={k} style={{ padding: '12px 16px', fontWeight: 700, borderBottom: '1px solid var(--border)', color: 'var(--text-primary)' }}>{k}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {data.map((row, i) => (
-              <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                 {keys.map(k => (
                   <td key={k} style={{ padding: '12px 16px' }}>
                     {typeof row[k] === 'object' ? JSON.stringify(row[k]) : String(row[k])}
@@ -1373,19 +1373,19 @@ function TableView({ data }: { data: any }) {
   // Case 2: Simple object (Key-Value table)
   if (typeof data === 'object' && !Array.isArray(data)) {
     const entries = Object.entries(data).filter(([_, v]) => typeof v !== 'object' || v === null);
-    if (entries.length === 0) return <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>표시할 데이터가 없습니다.</div>;
+    if (entries.length === 0) return <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>표시할 데이터가 없습니다.</div>;
     
     return (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '8px' }}>
         {entries.map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.04)' }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)' }}>{k}</span>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{String(v)}</span>
+          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--bg-secondary)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)' }}>{k}</span>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)' }}>{String(v)}</span>
           </div>
         ))}
       </div>
     );
   }
 
-  return <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>지원하지 않는 데이터 형식입니다.</div>;
+  return <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>지원하지 않는 데이터 형식입니다.</div>;
 }

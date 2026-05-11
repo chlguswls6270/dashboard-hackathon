@@ -1,40 +1,28 @@
 'use client';
 
-import { CATEGORY_META, type ProcessedData } from '@/lib/types';
-import { CAT_ICONS } from '@/lib/icons';
-import { ChevronRight, ArrowLeft, Clock, Database, Search, User } from 'lucide-react';
+import { type ProcessedData } from '@/lib/types';
+import { Clock, Database, Search, User } from 'lucide-react';
 
-export default function Header({ activeData, onBack, userName, onUserClick, searchQuery, onSearch }: { activeData: ProcessedData | null, onBack?: () => void, userName?: string | null, onUserClick?: () => void, searchQuery?: string, onSearch?: (query: string) => void }) {
+export default function Header({ activeData, userName, onUserClick, searchQuery, onSearch }: { activeData: ProcessedData | null, onBack?: () => void, userName?: string | null, onUserClick?: () => void, searchQuery?: string, onSearch?: (query: string) => void }) {
   return (
-    <header className="flex items-center justify-between px-6 border-b gap-6" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', padding: '16px 28px' }}>
-      {activeData ? (
-        <div className="flex items-center gap-3">
-          {onBack && (
-            <button onClick={onBack} className="p-1.5 rounded-lg hover:bg-white/5 mr-1 transition-colors">
-              <ArrowLeft size={18} style={{ color: 'var(--text-secondary)' }} />
-            </button>
-          )}
-          <span className="text-2xl" style={{ color: CATEGORY_META[activeData.category]?.color, display: 'flex' }}>
-            {CAT_ICONS[activeData.category]}
-          </span>
-          <div>
-            <div className="flex items-center gap-1.5 mb-0.5 text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
-              <button onClick={onBack} className="hover:text-white transition-colors">{activeData.categoryKo}</button>
-              <ChevronRight size={12} />
-              <span style={{ color: 'var(--accent)' }}>{activeData.title}</span>
-            </div>
-            <h1 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{activeData.title}</h1>
-          </div>
-        </div>
-      ) : (
-        <div className="shrink-0 hidden sm:block w-1" />
-      )}
+    <header
+      className="flex items-center justify-between px-6 border-b gap-6"
+      style={{
+        background: 'var(--bg-primary)',
+        borderColor: 'var(--border)',
+        height: '80px',
+        minHeight: '80px',
+        padding: '0 48px',
+        flexShrink: 0,
+      }}
+    >
+      <div className="shrink-0 hidden sm:block w-1" />
 
       {/* Search Bar */}
       <div style={{ flex: 1, maxWidth: '560px', margin: '0 auto' }}>
         <div style={{ position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, left: 0, paddingLeft: '14px', display: 'flex', alignItems: 'center', pointerEvents: 'none' }}>
-            <Search size={16} style={{ color: 'rgba(255,255,255,0.28)' }} />
+            <Search size={16} style={{ color: 'var(--text-muted)' }} />
           </div>
           <input
             type="text"
@@ -43,21 +31,21 @@ export default function Header({ activeData, onBack, userName, onUserClick, sear
             onChange={(e) => onSearch?.(e.target.value)}
             style={{
               width: '100%',
-              background: 'rgba(0,0,0,0.25)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
               borderRadius: '100px',
               padding: '11px 18px 11px 42px',
               fontSize: '13px',
-              color: 'white',
+              color: 'var(--text-primary)',
               outline: 'none',
               transition: 'border-color 0.2s, box-shadow 0.2s',
             }}
             onFocus={e => {
-              e.target.style.borderColor = 'rgba(99,102,241,0.6)';
-              e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.12)';
+              e.target.style.borderColor = 'rgba(0,208,124,0.6)';
+              e.target.style.boxShadow = '0 0 0 3px rgba(0,208,124,0.1)';
             }}
             onBlur={e => {
-              e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.target.style.borderColor = 'var(--border)';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -85,13 +73,15 @@ export default function Header({ activeData, onBack, userName, onUserClick, sear
         {userName && (
           <button 
             onClick={onUserClick}
-            style={{ paddingRight: '8px' }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-white/10 transition-colors border border-transparent hover:border-white/10"
+            style={{ paddingRight: '8px', border: '1px solid var(--border)', borderRadius: '9999px', padding: '4px 12px 4px 4px', background: 'var(--bg-secondary)', transition: 'all 0.15s' }}
+            className="flex items-center gap-2"
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,208,124,0.4)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}
           >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ background: 'linear-gradient(135deg, #00D07C, #007AFF)' }}>
               <User size={16} />
             </div>
-            <span className="text-sm font-semibold hidden md:block">{userName}</span>
+            <span className="text-sm font-semibold hidden md:block" style={{ color: 'var(--text-primary)' }}>{userName}</span>
           </button>
         )}
       </div>

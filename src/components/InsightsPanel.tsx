@@ -24,8 +24,8 @@ export default function InsightsPanel({ insights, riskLevel }: { insights: strin
               alignItems: 'flex-start',
               padding: '12px 16px',
               borderRadius: '12px',
-              background: 'rgba(99,102,241,0.05)',
-              border: '1px solid rgba(99,102,241,0.12)',
+              background: 'var(--brand-green-soft)',
+              border: '1px solid rgba(0,208,124,0.18)',
             }}
           >
             <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent)', flexShrink: 0, marginTop: '2px' }}>
