@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { type ProcessedData } from '@/lib/types';
-import { FileText, Trash2, GripVertical, Calendar, ChevronRight, AlertTriangle } from 'lucide-react';
+import ConfirmModal from './ConfirmModal';
+import { FileText, Trash2, GripVertical, Calendar, AlertTriangle } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, Tooltip } from 'recharts';
 
 const COLORS = ['var(--accent)', 'var(--brand-blue)', '#06b6d4', 'var(--warning)', 'var(--danger)', '#f97316', '#22c55e'];
@@ -345,80 +346,34 @@ export default function UploadedDataDashboard({ items, onSelectItem, onDeleteIte
         })}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmId && (
-        <div className="animate-fade-in" style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'transparent',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-        }} onClick={() => setDeleteConfirmId(null)}>
-          <div className="animate-fade-up" style={{
-            background: '#FFFFFF',
-            border: '1px solid var(--border)',
-            borderRadius: '18px', padding: '28px', width: '100%', maxWidth: '420px',
-            boxShadow: '0 24px 70px rgba(26, 26, 26, 0.16)', display: 'flex', flexDirection: 'column', gap: '18px'
-          }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
-              <div style={{ width: 42, height: 42, borderRadius: '12px', background: 'var(--brand-red-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--danger)', flexShrink: 0 }}>
-                <AlertTriangle size={21} />
+      {/* Delete Confirmation Modal (Portal) */}
+      {deleteConfirmId && (() => {
+        const targetItem = sortedItems.find(item => item.id === deleteConfirmId);
+        return (
+          <ConfirmModal
+            icon={<AlertTriangle size={21} />}
+            title="데이터를 삭제할까요?"
+            description="삭제 후에는 이 분석 결과를 다시 복구할 수 없습니다."
+            confirmLabel="삭제"
+            onCancel={() => setDeleteConfirmId(null)}
+            onConfirm={() => { onDeleteItem(deleteConfirmId); setDeleteConfirmId(null); }}
+          >
+            {targetItem && (
+              <div style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+              }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
+                  {targetItem.title}
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{targetItem.categoryKo}</p>
               </div>
-              <div>
-                <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>데이터를 삭제할까요?</h3>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>삭제 후에는 이 분석 결과를 다시 복구할 수 없습니다.</p>
-              </div>
-            </div>
-            {(() => {
-              const targetItem = sortedItems.find(item => item.id === deleteConfirmId);
-              return targetItem ? (
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                }}>
-                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
-                    {targetItem.title}
-                  </p>
-                  <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{targetItem.categoryKo}</p>
-                </div>
-              ) : null;
-            })()}
-            <div style={{ display: 'flex', gap: '10px', marginTop: '2px' }}>
-              <button 
-                onClick={() => setDeleteConfirmId(null)}
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', background: '#FFFFFF', border: '1px solid var(--border)', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'var(--bg-secondary)';
-                  e.currentTarget.style.borderColor = 'var(--border-light)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = '#FFFFFF';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                }}
-              >
-                취소
-              </button>
-              <button 
-                onClick={() => {
-                  onDeleteItem(deleteConfirmId);
-                  setDeleteConfirmId(null);
-                }}
-                style={{ flex: 1, padding: '12px', borderRadius: '12px', background: 'var(--brand-red)', border: '1px solid rgba(255, 77, 77, 0.25)', color: '#FFFFFF', fontWeight: 800, cursor: 'pointer', transition: 'all 0.15s', boxShadow: '0 10px 24px rgba(255, 77, 77, 0.18)' }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#E83E3E';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'var(--brand-red)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
+          </ConfirmModal>
+        );
+      })()}
     </div>
   );
 }

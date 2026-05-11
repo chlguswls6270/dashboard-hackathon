@@ -5,7 +5,8 @@ import { type ProcessedData, type AlertItem } from '@/lib/types';
 import SummaryCard from './SummaryCard';
 import Sparkline from './Sparkline';
 import AlertModal from './AlertModal';
-import { Star, Clock, BellRing, Wallet, Trash2, FileText, Calendar } from 'lucide-react';
+import ConfirmModal from './ConfirmModal';
+import { Star, Clock, BellRing, Wallet, Trash2, FileText, Calendar, LogOut } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface MyPageDashboardProps {
@@ -18,6 +19,7 @@ interface MyPageDashboardProps {
   onAddAlert: (alert: Omit<AlertItem, 'id' | 'createdAt'>) => void;
   onToggleAlert: (id: string) => void;
   onDeleteAlert: (id: string) => void;
+  onLogout: () => void;
 }
 
 const COLORS = ['var(--accent)', 'var(--brand-blue)', '#06b6d4', '#f59e0b', 'var(--danger)', 'var(--brand-green-dark)'];
@@ -32,9 +34,10 @@ const sectionCard = {
 
 export default function MyPageDashboard({ 
   userName, cachedData, favorites, recentViews, alerts, 
-  onSelectItem, onAddAlert, onToggleAlert, onDeleteAlert 
+  onSelectItem, onAddAlert, onToggleAlert, onDeleteAlert, onLogout
 }: MyPageDashboardProps) {
   const [showModal, setShowModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const favoriteItems = cachedData.filter(d => favorites.includes(d.id));
   const recentItems = recentViews.map(id => cachedData.find(d => d.id === id)).filter(Boolean) as ProcessedData[];
   const uploadedItems = cachedData.filter(d => (d.data as any).isUserUploaded);
@@ -65,7 +68,7 @@ export default function MyPageDashboard({
             오늘도 성공적인 투자를 위해 모아차트가 함께합니다.
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           {[
             { label: '관심 종목', value: `${favoriteItems.length}개` },
             { label: '업로드 데이터', value: `${uploadedItems.length}개` },
@@ -245,7 +248,55 @@ export default function MyPageDashboard({
         </div>
       </div>
 
+      {/* ── Logout ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '8px', paddingBottom: '16px' }}>
+        <button
+          onClick={() => setShowLogoutConfirm(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '11px 28px',
+            borderRadius: '12px',
+            border: '1px solid var(--border)',
+            background: '#FFFFFF',
+            color: 'var(--text-muted)',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.18s',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = '#FFF5F5';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--danger)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,77,77,0.3)';
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+            (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)';
+            (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+          }}
+        >
+          <LogOut size={14} />
+          로그아웃
+        </button>
+      </div>
+
+      {/* ── Logout Confirm Modal (Portal) ── */}
+      {showLogoutConfirm && (
+        <ConfirmModal
+          icon={<LogOut size={21} />}
+          title="로그아웃하시겠어요?"
+          description="닉네임과 즐겨찾기 정보가 이 기기에서 삭제됩니다."
+          confirmLabel="로그아웃"
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={() => { setShowLogoutConfirm(false); onLogout(); }}
+        />
+      )}
+
       {showModal && (
+
         <AlertModal
           cachedData={cachedData}
           onClose={() => setShowModal(false)}

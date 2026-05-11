@@ -268,6 +268,19 @@ export default function DashboardPage() {
     setActiveItem(null);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('userName');
+    localStorage.removeItem('favorites');
+    localStorage.removeItem('recentViews');
+    localStorage.removeItem('alerts');
+    setUserName(null);
+    setFavorites([]);
+    setRecentViews([]);
+    setAlerts([]);
+    setActiveTab('home');
+    setActiveItem(null);
+  };
+
   const handleOpenNoticeTarget = async (id: string) => {
     const items = await loadAllFromCache();
     const target = items.find(item => item.id === id);
@@ -342,6 +355,7 @@ export default function DashboardPage() {
               onAddAlert={handleAddAlert}
               onToggleAlert={handleToggleAlert}
               onDeleteAlert={handleDeleteAlert}
+              onLogout={handleLogout}
             />
           ) : activeTab === 'upload' ? (
             <UploadPanel
