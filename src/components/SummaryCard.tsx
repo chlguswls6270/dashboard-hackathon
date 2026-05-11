@@ -87,7 +87,7 @@ export default function SummaryCard({ item, onClick }: { item: ProcessedData; on
             {item.title}
           </h3>
           <p style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
-            {subValue || item.categoryKo}
+            {item.categoryKo}
           </p>
         </div>
         {sparkData.length > 0 && (

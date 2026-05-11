@@ -53,21 +53,6 @@ export default function Header({ activeData, userName, onUserClick, searchQuery,
       </div>
 
       <div className="flex items-center gap-4">
-        {activeData && (
-          <>
-            <span className={`badge badge-${activeData.riskLevel}`}>
-              {activeData.riskLevel === 'low' ? '저위험' : activeData.riskLevel === 'medium' ? '중위험' : '고위험'}
-            </span>
-            <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <Database size={12} />
-              {activeData.metadata.dataSource}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
-              <Clock size={12} />
-              {new Date(activeData.metadata.processedAt).toLocaleTimeString('ko-KR')}
-            </div>
-          </>
-        )}
         
         {/* User Profile Button */}
         {userName && (

@@ -1,21 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { getSkillsContent, buildSystemPrompt, buildUserPrompt } from '@/lib/prompts';
+import { getSkillsContent, buildSystemPrompt, buildReanalyzePrompt } from '@/lib/prompts';
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const rawText = formData.get('text') as string | null;
-    const filename = formData.get('filename') as string | null;
+    const { currentData, prompt } = await req.json();
 
-    let dataText: string;
-    if (file) {
-      dataText = await file.text();
-    } else if (rawText) {
-      dataText = rawText;
-    } else {
-      return NextResponse.json({ error: '데이터가 없습니다.' }, { status: 400 });
+    if (!currentData || !prompt) {
+      return NextResponse.json({ error: '현재 데이터 상태와 프롬프트가 필요합니다.' }, { status: 400 });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -28,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     const skillsContent = getSkillsContent();
     const systemPrompt = buildSystemPrompt(skillsContent);
-    const userPrompt = buildUserPrompt(dataText, filename ?? undefined);
+    const userPrompt = buildReanalyzePrompt(JSON.stringify(currentData, null, 2), prompt);
 
     const result = await model.generateContent([
       { text: systemPrompt },
@@ -36,24 +28,19 @@ export async function POST(req: NextRequest) {
     ]);
 
     const responseText = result.response.text().trim();
-    console.log('[/api/process] AI Response Length:', responseText.length);
+    console.log('[/api/reanalyze] AI Response Length:', responseText.length);
 
-    // More robust JSON extraction: Find the first { and the last }
     const firstBrace = responseText.indexOf('{');
     const lastBrace = responseText.lastIndexOf('}');
     
     if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
-      console.error('[/api/process] Invalid AI Response:', responseText);
+      console.error('[/api/reanalyze] Invalid AI Response:', responseText);
       throw new Error('AI가 유효한 JSON 형식을 반환하지 않았습니다.');
     }
     
     const cleaned = responseText.substring(firstBrace, lastBrace + 1);
-
     const parsed = JSON.parse(cleaned);
 
-    // --- Enhanced Data Merging ---
-    // If AI returns visualization fields (like holdings, priceHistory) at root level,
-    // move them into the 'data' object where ChartPanel expects them.
     const systemFields = ['category', 'categoryKo', 'title', 'chartType', 'subChartType', 'summary', 'insights', 'riskLevel', 'timeRange', 'metadata', 'data', 'omittedData'];
     const dataObj = parsed.data && typeof parsed.data === 'object' ? { ...parsed.data } : {};
     
@@ -63,15 +50,14 @@ export async function POST(req: NextRequest) {
       }
     });
     parsed.data = dataObj;
-    // ----------------------------
 
-    parsed.metadata = parsed.metadata ?? {};
+    parsed.metadata = parsed.metadata ?? currentData.metadata ?? {};
     parsed.metadata.processedAt = new Date().toISOString();
-    parsed.metadata.dataSource = filename ?? 'upload';
+    parsed.metadata.reanalyzed = true;
 
     return NextResponse.json(parsed);
   } catch (err) {
-    console.error('[/api/process]', err);
+    console.error('[/api/reanalyze]', err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : '처리 중 오류가 발생했습니다.' },
       { status: 500 }

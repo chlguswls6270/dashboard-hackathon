@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   PieChart, Pie, Cell, RadarChart, Radar, PolarGrid,
@@ -11,6 +11,7 @@ import type { ProcessedData } from '@/lib/types';
 import StockChart from './StockChart';
 import ETFPriceChart from './ETFPriceChart';
 import Sparkline from '../Sparkline';
+import { GripVertical } from 'lucide-react';
 
 // ─── Portfolio 전용 상세 컴포넌트 ────────────────────────────────────
 const PF_PERIODS = [
@@ -361,7 +362,7 @@ function fmtNum(v: number, prefix = '') {
   return `${prefix}${v.toFixed(2)}`;
 }
 
-export default function ChartPanel({ data }: { data: ProcessedData }) {
+export default function ChartPanel({ data, onUpdate, isEditMode = true }: { data: ProcessedData, onUpdate?: (newData: ProcessedData) => void, isEditMode?: boolean }) {
   const d = data.data as any;
   const [openWindows, setOpenWindows] = useState<any[]>([]);
   const [maxZ, setMaxZ] = useState(100000);
@@ -1056,24 +1057,19 @@ export default function ChartPanel({ data }: { data: ProcessedData }) {
       );
     }
     case 'dynamic': {
-      const blocks = (d.blocks as any[]) ?? [];
       return (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '24px' }}>
-          {blocks.map((block, i) => (
-            <DynamicBlock key={block.id || i} block={block} openWindow={openWindow} />
-          ))}
-          
-          {/* 이동 가능한 윈도우들 (동적 분석 모드에서도 지원) */}
-          {openWindows.map(win => (
-            <DraggableMetricWindow 
-              key={win.id} 
-              win={win} 
-              onClose={() => closeWindow(win.id)}
-              onFocus={() => focusWindow(win.id)}
-              onMove={(x,y) => updatePos(win.id, x, y)}
-            />
-          ))}
-        </div>
+        <DynamicDashboardGrid 
+          initialBlocks={(d.blocks as any[]) ?? []}
+          data={data}
+          d={d}
+          onUpdate={onUpdate}
+          isEditMode={isEditMode}
+          openWindow={openWindow}
+          closeWindow={closeWindow}
+          focusWindow={focusWindow}
+          updatePos={updatePos}
+          openWindows={openWindows}
+        />
       );
     }
 
@@ -1174,26 +1170,173 @@ function DraggableMetricWindow({ win, onClose, onFocus, onMove }: {
   );
 }
 
+// ─── 동적 대시보드 그리드 렌더러 (Live Preview 지원) ─────────────────────
+function DynamicDashboardGrid({ initialBlocks, data, d, onUpdate, isEditMode, openWindow, closeWindow, focusWindow, updatePos, openWindows }: any) {
+  const [blocks, setBlocks] = useState(() => initialBlocks.map((b:any, i:number) => ({ ...b, _dragId: b.id || b.title || String(i) })));
+  const [draggedIdx, setDraggedIdx] = useState<number | null>(null);
+
+  useEffect(() => {
+    setBlocks(initialBlocks.map((b:any, i:number) => ({ ...b, _dragId: b.id || b.title || String(i) })));
+  }, [initialBlocks]);
+
+  const isEditable = data.data?.isUserUploaded === true && !!onUpdate && isEditMode;
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    if (!isEditable) return;
+    setDraggedIdx(index);
+    e.dataTransfer.setData('text/plain', index.toString());
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    if (!isEditable) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    
+    if (draggedIdx === null || draggedIdx === index) return;
+    
+    const newBlocks = [...blocks];
+    const [moved] = newBlocks.splice(draggedIdx, 1);
+    newBlocks.splice(index, 0, moved);
+    setDraggedIdx(index);
+    setBlocks(newBlocks);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    if (!isEditable) return;
+    e.preventDefault();
+    setDraggedIdx(null);
+    if (onUpdate) onUpdate({ ...data, data: { ...d, blocks } });
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIdx(null);
+  };
+
+  const handleResize = (index: number, newLayout: string) => {
+    if (!isEditable) return;
+    const newBlocks = [...blocks];
+    newBlocks[index] = { ...newBlocks[index], layout: newLayout };
+    setBlocks(newBlocks);
+  };
+
+  const handleResizeEnd = (index: number, newLayout: string) => {
+    if (!isEditable) return;
+    const newBlocks = [...blocks];
+    newBlocks[index] = { ...newBlocks[index], layout: newLayout };
+    if (onUpdate) onUpdate({ ...data, data: { ...d, blocks: newBlocks } });
+  };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '24px' }}>
+      {blocks.map((block: any, i: number) => {
+        const colSpan = block.layout === 'full' ? 'span 6' : block.layout === 'two-thirds' ? 'span 4' : block.layout === 'half' ? 'span 3' : 'span 2';
+        return (
+          <div
+            key={block._dragId}
+            draggable={isEditable}
+            onDragStart={(e) => handleDragStart(e, i)}
+            onDragOver={(e) => handleDragOver(e, i)}
+            onDrop={(e) => handleDrop(e, i)}
+            onDragEnd={handleDragEnd}
+            style={{
+              gridColumn: colSpan,
+              display: 'flex', flexDirection: 'column',
+              cursor: isEditable ? 'grab' : 'default',
+              opacity: draggedIdx === i ? 0.4 : 1, 
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              position: 'relative'
+            }}
+          >
+            <DynamicBlock 
+              block={block} 
+              openWindow={openWindow} 
+              isEditable={isEditable}
+              onResize={(layout) => handleResize(i, layout)}
+              onResizeEnd={(layout) => handleResizeEnd(i, layout)}
+            />
+          </div>
+        );
+      })}
+      
+      {openWindows.map((win: any) => (
+        <DraggableMetricWindow 
+          key={win.id} 
+          win={win} 
+          onClose={() => closeWindow(win.id)}
+          onFocus={() => focusWindow(win.id)}
+          onMove={(x,y) => updatePos(win.id, x, y)}
+        />
+      ))}
+    </div>
+  );
+}
+
 // ─── 동적 대시보드 블록 렌더러 ─────────────────────────────────────
-function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) => void }) {
-  const colSpan = block.layout === 'full' ? 'span 6' : block.layout === 'half' ? 'span 3' : 'span 2';
+function DynamicBlock({ block, openWindow, isEditable, onResize, onResizeEnd }: { block: any, openWindow: (m: any) => void, isEditable?: boolean, onResize?: (layout: string) => void, onResizeEnd?: (layout: string) => void }) {
   
+  const handleResizeStart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!onResize) return;
+
+    const getSpan = (l: string) => l === 'full' ? 6 : l === 'two-thirds' ? 4 : l === 'half' ? 3 : 2;
+    const initialSpan = getSpan(block.layout || 'third');
+    const startX = e.clientX;
+    const pixelsPerSpan = 150;
+    
+    let lastCalculatedLayout = block.layout || 'third';
+
+    const onMouseMove = (em: MouseEvent) => {
+      const deltaX = em.clientX - startX;
+      const deltaSpan = Math.round(deltaX / pixelsPerSpan);
+      
+      let newSpan = initialSpan + deltaSpan;
+      if (newSpan < 2) newSpan = 2;
+      if (newSpan > 6) newSpan = 6;
+      if (newSpan === 5) newSpan = deltaSpan > 0 ? 6 : 4;
+
+      const getLayout = (s: number) => s === 6 ? 'full' : s === 4 ? 'two-thirds' : s === 3 ? 'half' : 'third';
+      const newLayout = getLayout(newSpan);
+      
+      if (newLayout !== lastCalculatedLayout) {
+        lastCalculatedLayout = newLayout;
+        onResize(newLayout);
+      }
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      if (onResizeEnd) {
+         onResizeEnd(lastCalculatedLayout);
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
+
   return (
     <div style={{
-      gridColumn: colSpan,
+      flex: 1,
       background: 'var(--surface-raised)',
       border: '1px solid var(--border)',
       borderRadius: '16px',
       padding: '20px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '16px'
+      gap: '16px',
+      position: 'relative'
     }}>
       {block.title && (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)' }}>{block.title}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isEditable && <GripVertical size={16} color="var(--text-muted)" />}
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{block.title}</h3>
+          </div>
           {block.description && (
-             <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{block.description}</div>
+             <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{block.description}</div>
           )}
         </div>
       )}
@@ -1201,6 +1344,26 @@ function DynamicBlock({ block, openWindow }: { block: any, openWindow: (m: any) 
       <div style={{ flex: 1, minHeight: '100px' }}>
         {renderBlockContent(block, openWindow)}
       </div>
+
+      {isEditable && onResize && (
+        <div 
+          onMouseDown={handleResizeStart}
+          style={{
+            position: 'absolute',
+            right: -8,
+            top: 0,
+            bottom: 0,
+            width: '16px',
+            cursor: 'col-resize',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}
+        >
+          <div style={{ width: '4px', height: '32px', background: 'var(--border)', borderRadius: '2px' }} />
+        </div>
+      )}
     </div>
   );
 }
@@ -1273,21 +1436,20 @@ function renderBlockContent(block: any, openWindow: (m: any) => void) {
               <Bar dataKey={yKey} fill="var(--brand-blue)" radius={[4, 4, 0, 0]} />
             </BarChart>
           ) : chartType === 'pie' ? (
-            <PieChart>
+            <PieChart margin={{ top: 0, right: 30, bottom: 0, left: 0 }}>
               <Pie 
                 data={block.data} 
                 dataKey={valueKey} 
                 nameKey={nameKey} 
-                cx="50%" 
+                cx="40%" 
                 cy="50%" 
                 outerRadius={80} 
                 innerRadius={50}
-                label={(props: any) => `${props[nameKey]} (${props[valueKey]}%)`}
-                labelLine={false}
               >
                 {block.data.map((_: any, i: number) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
               </Pie>
               <Tooltip contentStyle={tooltipStyle} />
+              <Legend layout="vertical" verticalAlign="middle" align="right" wrapperStyle={{ fontSize: '11px', right: 0 }} />
             </PieChart>
           ) : (
             <AreaChart data={block.data}>

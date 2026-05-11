@@ -14,14 +14,19 @@ import MyPageDashboard from '@/components/MyPageDashboard';
 import PortfolioFeedPage from '@/components/PortfolioFeedPage';
 import UploadedDataDashboard from '@/components/UploadedDataDashboard';
 import SearchResultsDashboard from '@/components/SearchResultsDashboard';
-import { AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 
-type ProcessNotice = {
-  status: 'idle' | 'processing' | 'success' | 'error';
+export type NoticeStatus = 'processing' | 'success' | 'error' | 'pending_approval';
+
+export interface ProcessNotice {
+  id: string;
+  status: NoticeStatus;
   title: string;
   message: string;
   targetItemId?: string;
-};
+  pendingData?: ProcessedData;
+  timestamp: number;
+}
 
 export default function DashboardPage() {
   const [cachedData, setCachedData] = useState<ProcessedData[]>([]);
@@ -31,11 +36,34 @@ export default function DashboardPage() {
   const [processing, setProcessing] = useState(false);
   const [processingName, setProcessingName] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [processNotice, setProcessNotice] = useState<ProcessNotice>({
-    status: 'idle',
-    title: '',
-    message: '',
-  });
+  const [notices, setNotices] = useState<ProcessNotice[]>([]);
+
+  const addOrUpdateNotice = (notice: Partial<ProcessNotice> & { id: string }) => {
+    setNotices(prev => {
+      const existingIdx = prev.findIndex(n => n.id === notice.id);
+      let newNotices = [...prev];
+      if (existingIdx >= 0) {
+        newNotices[existingIdx] = { ...newNotices[existingIdx], ...notice, timestamp: Date.now() };
+      } else {
+        newNotices.unshift({ ...notice, timestamp: Date.now() } as ProcessNotice);
+      }
+      
+      newNotices.sort((a, b) => {
+        const aCompleted = ['success', 'error', 'pending_approval'].includes(a.status);
+        const bCompleted = ['success', 'error', 'pending_approval'].includes(b.status);
+        if (aCompleted && !bCompleted) return -1;
+        if (!aCompleted && bCompleted) return 1;
+        return b.timestamp - a.timestamp; // 나중에 뜬 게 위로
+      });
+      
+      return newNotices;
+    });
+  };
+
+  const removeNotice = (id: string) => {
+    setNotices(prev => prev.filter(n => n.id !== id));
+  };
+
   const activeTabRef = useRef(activeTab);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -142,11 +170,13 @@ export default function DashboardPage() {
     setProcessing(true);
     setError(null);
     const startedFromTab = activeTabRef.current;
+    const taskId = `process_${Date.now()}`;
     try {
       if (dummyCat) {
         const noticeName = `${CATEGORY_META[dummyCat as CategoryKey].ko} 데이터`;
         setProcessingName(noticeName);
-        setProcessNotice({
+        addOrUpdateNotice({
+          id: taskId,
           status: 'processing',
           title: '데이터 불러오는 중',
           message: `${noticeName}를 준비하고 있습니다.`,
@@ -155,13 +185,13 @@ export default function DashboardPage() {
         const result = await res.json();
         if (result.error) throw new Error(result.error);
         
-        // Save all items to cache
         for (const item of result.items) {
           await saveToCache(item);
         }
         
         await refreshCache();
-        setProcessNotice({
+        addOrUpdateNotice({
+          id: taskId,
           status: 'success',
           title: '데이터 불러오기 완료',
           message: `${noticeName}가 준비되었습니다.`,
@@ -173,7 +203,8 @@ export default function DashboardPage() {
       } else if (file) {
         const noticeName = file.name;
         setProcessingName(noticeName);
-        setProcessNotice({
+        addOrUpdateNotice({
+          id: taskId,
           status: 'processing',
           title: 'AI 분석 진행 중',
           message: `${noticeName}을 분석하고 있습니다.`,
@@ -189,16 +220,15 @@ export default function DashboardPage() {
         const result = await res.json();
         if (result.error) throw new Error(result.error);
         
-        // Handle single item upload
         const item = result;
-        // Use a generated id if not present
         if (!item.id) item.id = `${item.category}_${Date.now()}`;
         if (!item.data) item.data = {};
         item.data.isUserUploaded = true;
         
         await saveToCache(item);
         await refreshCache();
-        setProcessNotice({
+        addOrUpdateNotice({
+          id: taskId,
           status: 'success',
           title: 'AI 분석 완료',
           message: `${item.title || noticeName} 분석이 완료되었습니다.`,
@@ -212,7 +242,8 @@ export default function DashboardPage() {
     } catch (err: any) {
       const message = err.message || '데이터 처리 중 오류가 발생했습니다.';
       setError(message);
-      setProcessNotice({
+      addOrUpdateNotice({
+        id: taskId,
         status: 'error',
         title: '처리 실패',
         message,
@@ -230,9 +261,71 @@ export default function DashboardPage() {
     }
   };
 
+  const handleUpdateItem = async (updatedData: ProcessedData) => {
+    await saveToCache(updatedData);
+    await refreshCache();
+    if (activeItem?.id === updatedData.id) {
+      setActiveItem(updatedData);
+    }
+  };
+
+  const handleReanalyzeRequest = async (currentData: ProcessedData, prompt: string) => {
+    const taskId = `reanalyze_${currentData.id}_${Date.now()}`;
+    addOrUpdateNotice({
+      id: taskId,
+      status: 'processing',
+      title: 'AI 재분석 진행 중',
+      message: `${currentData.title}의 새로운 차트를 생성하고 있습니다.`,
+    });
+
+    try {
+      const res = await fetch('/api/reanalyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentData, prompt })
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      
+      result.id = currentData.id;
+      if (result.data) result.data.isUserUploaded = (currentData.data as any)?.isUserUploaded;
+      
+      addOrUpdateNotice({
+        id: taskId,
+        status: 'pending_approval',
+        title: '재분석 완료',
+        message: `${currentData.title}의 새로운 분석 결과가 준비되었습니다.`,
+        pendingData: result,
+        targetItemId: currentData.id,
+      });
+    } catch (err: any) {
+      console.error(err);
+      addOrUpdateNotice({
+        id: taskId,
+        status: 'error',
+        title: '재분석 실패',
+        message: '재분석 중 오류가 발생했습니다.',
+      });
+    }
+  };
+
+  const handleApproveReanalyze = async (taskId: string, pendingData: ProcessedData) => {
+    await saveToCache(pendingData);
+    await refreshCache();
+    if (activeItem?.id === pendingData.id) {
+      setActiveItem(pendingData);
+    }
+    removeNotice(taskId);
+  };
+
+  const handleRejectReanalyze = (taskId: string) => {
+    removeNotice(taskId);
+  };
+
   const handleSelectTab = async (tab: string) => {
     setActiveTab(tab);
     setActiveItem(null);
+    setSearchQuery('');
 
     // 카테고리 탭이면 항상 최신 API 데이터로 갱신 (캐시 stale 방지)
     const validCategories = Object.keys(CATEGORY_META) as CategoryKey[];
@@ -290,7 +383,6 @@ export default function DashboardPage() {
     setSearchQuery('');
     setActiveTab('uploaded');
     handleSelectItem(target);
-    setProcessNotice({ status: 'idle', title: '', message: '' });
   };
 
   const activeCategory = Object.keys(CATEGORY_META).includes(activeTab) ? activeTab as CategoryKey : null;
@@ -308,11 +400,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen overflow-hidden bg-grid" style={{ background: 'var(--bg-primary)' }}>
       {isClient && !userName && <LoginOverlay onLogin={handleLogin} />}
-      <ProcessStatusToast
-        notice={processNotice}
-        onClose={() => setProcessNotice({ status: 'idle', title: '', message: '' })}
-        onOpenTarget={handleOpenNoticeTarget}
-      />
+      {/* The unified notices stack is rendered below main content */}
       
       {/* Sidebar */}
       <Sidebar
@@ -363,12 +451,11 @@ export default function DashboardPage() {
               processing={processing}
               processingName={processingName}
               error={error}
-              processNotice={processNotice}
               onClose={() => setActiveTab('home')}
             />
           ) : activeTab === 'uploaded' && !activeItem ? (
             <UploadedDataDashboard
-              items={cachedData.filter((item: any) => item.data?.isUserUploaded === true)}
+              items={cachedData.filter((item: any) => item.data?.isUserUploaded === true).reverse()}
               onSelectItem={handleSelectItem}
               onDeleteItem={handleDeleteItem}
             />
@@ -395,6 +482,9 @@ export default function DashboardPage() {
               isFavorite={favorites.includes(activeItem.id)}
               onBack={handleBackToSummary}
               onToggleFavorite={() => handleToggleFavorite(activeItem.id)}
+              onUpdate={handleUpdateItem}
+              onRequestReanalyze={handleReanalyzeRequest}
+              isReanalyzing={notices.some(n => n.status === 'processing' && n.id.startsWith(`reanalyze_${activeItem.id}`))}
             />
           ) : (
             <HomeDashboard 
@@ -405,24 +495,72 @@ export default function DashboardPage() {
           )}
         </main>
       </div>
+
+      <div style={{
+        position: 'fixed', top: '96px', right: '32px', zIndex: 1000,
+        display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-end',
+        pointerEvents: 'none'
+      }}>
+        {notices.map(notice => (
+          <ProcessNoticeCard 
+            key={notice.id} 
+            notice={notice} 
+            onClose={() => removeNotice(notice.id)}
+            onOpenTarget={handleOpenNoticeTarget}
+            onApprove={() => notice.pendingData && handleApproveReanalyze(notice.id, notice.pendingData)}
+            onReject={() => handleRejectReanalyze(notice.id)}
+            onGoToTarget={() => {
+              if (notice.targetItemId) {
+                const target = cachedData.find(item => item.id === notice.targetItemId) || notice.pendingData;
+                if (target) {
+                  setActiveItem(target);
+                }
+              }
+            }}
+            isActiveItem={activeItem?.id === notice.targetItemId}
+          />
+        ))}
+      </div>
     </div>
   );
 }
 
-function ProcessStatusToast({ notice, onClose, onOpenTarget }: { notice: ProcessNotice; onClose: () => void; onOpenTarget: (id: string) => void }) {
-  if (notice.status === 'idle') return null;
-
+function ProcessNoticeCard({ 
+  notice, onClose, onOpenTarget, onApprove, onReject, onGoToTarget, isActiveItem 
+}: { 
+  notice: ProcessNotice; onClose: () => void; onOpenTarget: (id: string) => void; 
+  onApprove: () => void; onReject: () => void; onGoToTarget: () => void; isActiveItem: boolean;
+}) {
   const isProcessing = notice.status === 'processing';
   const isSuccess = notice.status === 'success';
+  const isPendingApproval = notice.status === 'pending_approval';
+  
   const canOpenTarget = Boolean(isSuccess && notice.targetItemId);
-  const color = isProcessing ? 'var(--brand-blue)' : isSuccess ? 'var(--success)' : 'var(--danger)';
-  const bg = isProcessing ? 'rgba(0,122,255,0.08)' : isSuccess ? 'var(--brand-green-soft)' : 'var(--brand-red-soft)';
+  
+  let color = 'var(--text-primary)';
+  let bg = '#FFFFFF';
+  let iconBg = 'var(--bg-secondary)';
+  let iconColor = 'var(--text-secondary)';
+  
+  if (isProcessing) {
+    iconColor = 'var(--brand-blue)';
+    iconBg = 'rgba(0,122,255,0.08)';
+  } else if (isSuccess) {
+    iconColor = 'var(--success)';
+    iconBg = 'var(--brand-green-soft)';
+  } else if (isPendingApproval) {
+    iconColor = 'var(--success)';
+    iconBg = 'var(--brand-green-soft)';
+  } else {
+    iconColor = 'var(--danger)';
+    iconBg = 'var(--brand-red-soft)';
+  }
 
   return (
     <div
       className="animate-fade-up"
       onClick={() => {
-        if (notice.targetItemId) onOpenTarget(notice.targetItemId);
+        if (canOpenTarget && notice.targetItemId) onOpenTarget(notice.targetItemId);
       }}
       role={canOpenTarget ? 'button' : undefined}
       tabIndex={canOpenTarget ? 0 : undefined}
@@ -434,39 +572,34 @@ function ProcessStatusToast({ notice, onClose, onOpenTarget }: { notice: Process
         }
       }}
       style={{
-        position: 'fixed',
-        top: '96px',
-        right: '32px',
         width: '320px',
-        background: '#FFFFFF',
+        background: bg,
         border: '1px solid var(--border)',
         borderRadius: '14px',
         boxShadow: '0 18px 46px rgba(15, 23, 42, 0.14)',
         padding: '14px 16px',
-        zIndex: 1000,
+        pointerEvents: 'auto',
         cursor: canOpenTarget ? 'pointer' : 'default',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
         <div style={{
-          width: '34px',
-          height: '34px',
-          borderRadius: '10px',
-          background: bg,
-          color,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
+          width: '34px', height: '34px', borderRadius: '10px',
+          background: iconBg, color: iconColor,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-          {isProcessing ? <Loader2 size={18} className="animate-spin" /> : isSuccess ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          {isProcessing ? <Loader2 size={18} className="animate-spin" /> : 
+           isPendingApproval ? <Sparkles size={18} /> : 
+           isSuccess ? <CheckCircle2 size={18} /> : 
+           <AlertCircle size={18} />}
         </div>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '3px' }}>
             {notice.title}
           </p>
           <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-            {notice.message}
+            {isPendingApproval && isActiveItem ? '새로운 결과가 준비되었습니다. 승인하여 기존 데이터를 대체하시겠습니까?' : notice.message}
           </p>
           {canOpenTarget && (
             <p style={{ fontSize: '11px', color: 'var(--brand-green-dark)', fontWeight: 800, marginTop: '6px' }}>
@@ -482,22 +615,62 @@ function ProcessStatusToast({ notice, onClose, onOpenTarget }: { notice: Process
             }}
             aria-label="알림 닫기"
             style={{
-              color: 'var(--text-muted)',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '16px',
-              lineHeight: 1,
-              padding: '2px',
+              color: 'var(--text-muted)', background: 'transparent', border: 'none',
+              cursor: 'pointer', fontSize: '16px', lineHeight: 1, padding: '2px',
             }}
           >
             ×
           </button>
         )}
       </div>
+
       {isProcessing && (
         <div style={{ marginTop: '12px', height: '3px', borderRadius: '999px', overflow: 'hidden', background: 'var(--bg-secondary)' }}>
-          <div style={{ width: '42%', height: '100%', borderRadius: '999px', background: color, animation: 'progress-slide 1.2s ease-in-out infinite' }} />
+          <div style={{ width: '42%', height: '100%', borderRadius: '999px', background: iconColor, animation: 'progress-slide 1.2s ease-in-out infinite' }} />
+        </div>
+      )}
+
+      {isPendingApproval && (
+        <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingLeft: '46px' }}>
+          {isActiveItem ? (
+            <>
+              <button
+                onClick={onReject}
+                style={{ flex: 1, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '6px 0', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--border)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+              >
+                거절
+              </button>
+              <button
+                onClick={onApprove}
+                style={{ flex: 1, background: 'var(--brand-blue)', border: 'none', color: '#fff', padding: '6px 0', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                승인
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={onReject}
+                style={{ flex: 1, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)', padding: '6px 0', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--border)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+              >
+                무시
+              </button>
+              <button
+                onClick={onGoToTarget}
+                style={{ flex: 1, background: 'var(--brand-blue)', border: 'none', color: '#fff', padding: '6px 0', borderRadius: '8px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', transition: 'opacity 0.2s' }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.9'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                보러 가기
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

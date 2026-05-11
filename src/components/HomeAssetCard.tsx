@@ -77,9 +77,6 @@ export default function HomeAssetCard({ item, onClick }: HomeAssetCardProps) {
           <h3 className="font-bold text-lg leading-tight group-hover:text-[var(--accent)] transition-colors line-clamp-1">
             {item.title}
           </h3>
-          <p className="text-xs opacity-60 mt-0.5 line-clamp-1">
-            {d.ticker || d.symbol || d.pair || 'Market Asset'}
-          </p>
         </div>
 
         <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: isPositive ? 'rgba(0,208,124,0.1)' : 'rgba(255,77,77,0.1)', color }}>

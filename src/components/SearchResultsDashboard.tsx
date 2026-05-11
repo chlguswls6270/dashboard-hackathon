@@ -1,7 +1,7 @@
 'use client';
 
 import { type ProcessedData } from '@/lib/types';
-import { Calendar, FileText, Search } from 'lucide-react';
+import { Calendar, FileText, Search, Sparkles } from 'lucide-react';
 import Sparkline from './Sparkline';
 
 interface SearchResultsDashboardProps {
@@ -25,11 +25,7 @@ function getSparkData(item: ProcessedData): number[] {
   return [];
 }
 
-function getTicker(item: ProcessedData) {
-  const d = item.data as DataRecord;
-  const value = d.ticker || d.symbol || d.pair || d.fundCode;
-  return typeof value === 'string' || typeof value === 'number' ? String(value) : item.categoryKo;
-}
+
 
 export default function SearchResultsDashboard({ items, onSelectItem, query }: SearchResultsDashboardProps) {
   if (items.length === 0) {
@@ -131,9 +127,6 @@ export default function SearchResultsDashboard({ items, onSelectItem, query }: S
 
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
                 <div>
-                  <p style={{ fontSize: '12px', color: 'var(--brand-blue)', fontWeight: 700, marginBottom: '6px' }}>
-                    {getTicker(item)}
-                  </p>
                   <h3 style={{
                     fontSize: '16px',
                     fontWeight: 700,
@@ -147,17 +140,32 @@ export default function SearchResultsDashboard({ items, onSelectItem, query }: S
                   }}>
                     {item.title}
                   </h3>
-                  <p style={{
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)',
-                    lineHeight: 1.5,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                  }}>
-                    {item.summary}
-                  </p>
+                  {item.insights && item.insights.length > 0 && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '6px',
+                      background: 'rgba(139, 92, 246, 0.06)',
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      marginTop: '8px'
+                    }}>
+                      <div style={{ color: '#8b5cf6', flexShrink: 0, marginTop: '2px' }}>
+                        <Sparkles size={12} />
+                      </div>
+                      <p style={{
+                        fontSize: '11px',
+                        color: 'var(--text-secondary)',
+                        lineHeight: 1.4,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}>
+                        {item.insights[0]}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '11px', marginTop: 'auto' }}>

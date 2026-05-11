@@ -38,6 +38,7 @@ export default function MyPageDashboard({
 }: MyPageDashboardProps) {
   const [showModal, setShowModal] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [deleteAlertConfirmId, setDeleteAlertConfirmId] = useState<string | null>(null);
   const favoriteItems = cachedData.filter(d => favorites.includes(d.id));
   const recentItems = recentViews.map(id => cachedData.find(d => d.id === id)).filter(Boolean) as ProcessedData[];
   const uploadedItems = cachedData.filter(d => (d.data as any).isUserUploaded);
@@ -184,7 +185,7 @@ export default function MyPageDashboard({
                         >
                           <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'white', boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }} />
                         </button>
-                        <button onClick={() => onDeleteAlert(alert.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', transition: 'color 0.2s', padding: '2px' }}
+                        <button onClick={() => setDeleteAlertConfirmId(alert.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', transition: 'color 0.2s', padding: '2px' }}
                           onMouseEnter={e => (e.currentTarget.style.color = 'var(--danger)')}
                           onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
                           <Trash2 size={14} />
@@ -282,6 +283,37 @@ export default function MyPageDashboard({
           로그아웃
         </button>
       </div>
+
+      {/* ── Delete Alert Confirm Modal (Portal) ── */}
+      {deleteAlertConfirmId && (() => {
+        const targetAlert = alerts.find(a => a.id === deleteAlertConfirmId);
+        return (
+          <ConfirmModal
+            icon={<Trash2 size={21} />}
+            title="알림을 삭제할까요?"
+            description="삭제한 알림은 복구할 수 없습니다."
+            confirmLabel="삭제"
+            onCancel={() => setDeleteAlertConfirmId(null)}
+            onConfirm={() => { onDeleteAlert(deleteAlertConfirmId); setDeleteAlertConfirmId(null); }}
+          >
+            {targetAlert && (
+              <div style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+              }}>
+                <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: '3px' }}>
+                  {targetAlert.name}
+                </p>
+                <p style={{ fontSize: '11px', color: 'var(--brand-green-dark)' }}>
+                  목표가: {targetAlert.targetPrice.toLocaleString()} {targetAlert.condition === 'above' ? '이상 ↑' : '이하 ↓'}
+                </p>
+              </div>
+            )}
+          </ConfirmModal>
+        );
+      })()}
 
       {/* ── Logout Confirm Modal (Portal) ── */}
       {showLogoutConfirm && (

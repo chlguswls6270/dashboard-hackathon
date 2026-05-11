@@ -52,6 +52,21 @@ ${rawData.slice(0, 8000)}
    }
 3. 데이터가 단순하다면 Skills.md의 특정 카테고리(stock, etf 등)를 사용해도 좋습니다.
 4. 어떤 경우에도 'data' 객체 내부에 실제 분석된 수치와 리포트 내용이 반드시 포함되어야 합니다. 빈 객체를 반환하지 마세요.
+5. 제공된 전체 데이터 중 시각화 블록(차트, 지표 등)에 포함되지 않은 나머지 원본 데이터 값들은 빠짐없이 정리하여 최상위 JSON의 'omittedData' 키에 {"필드명": "값"} 형태의 객체로 포함하세요.
 
 분석을 시작하세요.`;
+}
+
+export function buildReanalyzePrompt(currentDataStr: string, userPrompt: string): string {
+  return `이전에 분석된 금융 데이터 JSON 상태와 사용자의 추가 요구사항입니다.
+요구사항을 반영하여 기존 JSON을 수정/보완한 새로운 전체 JSON을 반환하세요.
+반드시 유효한 JSON 형식으로만 응답해야 합니다.
+
+사용자 요구사항:
+${userPrompt}
+
+현재 분석된 데이터 JSON:
+${currentDataStr}
+
+위의 데이터를 바탕으로 사용자의 요구사항을 반영하여 수정된 JSON 전체를 생성하세요.`;
 }

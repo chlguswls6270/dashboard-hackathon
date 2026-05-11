@@ -3,24 +3,15 @@
 import { useState, useRef, useCallback } from 'react';
 import { Upload, Loader2, FileJson, FileText, Database, TrendingUp, Search, Zap, Layers, PieChart, BarChart2, Activity, Type, CheckCircle2, AlertCircle } from 'lucide-react';
 
-type ProcessNotice = {
-  status: 'idle' | 'processing' | 'success' | 'error';
-  title: string;
-  message: string;
-  targetItemId?: string;
-};
-
 interface UploadPanelProps {
   onProcess: (file: File | null, dummyKey?: string) => Promise<void>;
   processing: boolean;
   processingName: string;
   error: string | null;
-  processNotice: ProcessNotice;
-  // onClose is kept in props just in case it's used elsewhere, but we won't render the X button.
   onClose: () => void;
 }
 
-export default function UploadPanel({ onProcess, processing, processingName, error, processNotice }: UploadPanelProps) {
+export default function UploadPanel({ onProcess, processing, processingName, error, onClose }: UploadPanelProps) {
   const [dragOver, setDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [inputType, setInputType] = useState<'file' | 'text'>('file');
@@ -183,24 +174,7 @@ export default function UploadPanel({ onProcess, processing, processingName, err
           </div>
         </div>
 
-        {!processing && processNotice.status === 'success' && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '14px 16px',
-            borderRadius: '14px',
-            border: '1px solid rgba(0,208,124,0.24)',
-            background: 'var(--brand-green-soft)',
-          }}>
-            <CheckCircle2 size={18} style={{ color: 'var(--success)', flexShrink: 0 }} />
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-              {processNotice.message}
-            </p>
-          </div>
-        )}
-
-        {!processing && processNotice.status === 'error' && (
+        {!processing && error && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -212,13 +186,13 @@ export default function UploadPanel({ onProcess, processing, processingName, err
           }}>
             <AlertCircle size={18} style={{ color: 'var(--danger)', flexShrink: 0 }} />
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.45 }}>
-              {processNotice.message}
+              {error}
             </p>
           </div>
         )}
 
         {/* Input Area */}
-        {(processing || processNotice.status === 'processing') ? (
+        {processing ? (
           <div
             style={{
               border: '1px solid rgba(0,122,255,0.22)',
@@ -252,7 +226,7 @@ export default function UploadPanel({ onProcess, processing, processingName, err
               분석이 진행 중입니다
             </p>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.55, maxWidth: '360px' }}>
-              {processNotice.message || `${processingName} 분석을 진행하고 있습니다.`}
+              {`${processingName} 분석을 진행하고 있습니다.`}
             </p>
             <div style={{ width: '220px', height: '4px', borderRadius: '999px', overflow: 'hidden', background: '#FFFFFF', marginTop: '24px' }}>
               <div style={{ width: '42%', height: '100%', borderRadius: '999px', background: 'var(--brand-blue)', animation: 'progress-slide 1.2s ease-in-out infinite' }} />
@@ -369,7 +343,7 @@ export default function UploadPanel({ onProcess, processing, processingName, err
         )}
 
         {/* Action Button */}
-        {isReady && !submitted && !processing && processNotice.status !== 'processing' && (
+        {isReady && !submitted && !processing && (
           <button
             onClick={handleProcessClick}
             disabled={processing}
