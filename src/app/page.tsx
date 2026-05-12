@@ -25,6 +25,7 @@ export interface ProcessNotice {
   message: string;
   targetItemId?: string;
   pendingData?: ProcessedData;
+  previousData?: ProcessedData;
   timestamp: number;
 }
 
@@ -296,8 +297,13 @@ export default function DashboardPage() {
         title: '재분석 완료',
         message: `${currentData.title}의 새로운 분석 결과가 준비되었습니다.`,
         pendingData: result,
+        previousData: currentData,
         targetItemId: currentData.id,
       });
+
+      if (activeItem?.id === currentData.id) {
+        setActiveItem(result);
+      }
     } catch (err: any) {
       console.error(err);
       addOrUpdateNotice({
@@ -318,7 +324,10 @@ export default function DashboardPage() {
     removeNotice(taskId);
   };
 
-  const handleRejectReanalyze = (taskId: string) => {
+  const handleRejectReanalyze = (taskId: string, previousData?: ProcessedData) => {
+    if (previousData && activeItem?.id === previousData.id) {
+      setActiveItem(previousData);
+    }
     removeNotice(taskId);
   };
 
@@ -508,10 +517,10 @@ export default function DashboardPage() {
             onClose={() => removeNotice(notice.id)}
             onOpenTarget={handleOpenNoticeTarget}
             onApprove={() => notice.pendingData && handleApproveReanalyze(notice.id, notice.pendingData)}
-            onReject={() => handleRejectReanalyze(notice.id)}
+            onReject={() => handleRejectReanalyze(notice.id, notice.previousData)}
             onGoToTarget={() => {
               if (notice.targetItemId) {
-                const target = cachedData.find(item => item.id === notice.targetItemId) || notice.pendingData;
+                const target = notice.pendingData || cachedData.find(item => item.id === notice.targetItemId);
                 if (target) {
                   setActiveItem(target);
                 }
