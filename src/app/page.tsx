@@ -1,4 +1,5 @@
 'use client';
+import { protectedFetch } from '@/lib/protected-fetch';
 
 import { useState, useEffect, useRef } from 'react';
 import { CATEGORY_META, type CategoryKey, type ProcessedData, type AlertItem } from '@/lib/types';
@@ -214,7 +215,7 @@ export default function DashboardPage() {
         formData.append('file', file);
         formData.append('filename', file.name);
 
-        const res = await fetch('/api/process', {
+        const res = await protectedFetch('/api/process', {
           method: 'POST',
           body: formData,
         });
@@ -280,7 +281,7 @@ export default function DashboardPage() {
     });
 
     try {
-      const res = await fetch('/api/reanalyze', {
+      const res = await protectedFetch('/api/reanalyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentData, prompt })
@@ -685,3 +686,4 @@ function ProcessNoticeCard({
     </div>
   );
 }
+
