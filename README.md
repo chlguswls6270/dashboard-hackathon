@@ -1,98 +1,93 @@
-# 모아차트
+# MoaChart · 모아차트
 
-AI 기반 투자 데이터 대시보드입니다. 더미 금융 데이터와 사용자가 업로드한 Raw 데이터를 분석해 카테고리별 요약, 상세 차트, 인사이트, 최근 열람 기록, 업로드 데이터 관리를 제공합니다.
+**Personal project · Full-stack data dashboard · AI-assisted financial-data visualization**
 
-## 주요 기능
+Explore sample financial datasets, turn uploaded data into chart-based summaries, and revisit saved analysis in the browser.
 
-- 투자 데이터 홈 대시보드
-- 주식, ETF, 포트폴리오, 재무 지표, 시장 지표 등 카테고리별 데이터 탐색
-- 파일 또는 텍스트 기반 AI 분석
-- 업로드한 분석 결과 카드형 관리, 삭제, 상세 보기
-- 분석 진행/완료 전역 알림
-- 즐겨찾기, 최근 열람 기록, 목표가 알림
-- IndexedDB 기반 브라우저 로컬 캐시
+**Stack:** Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Recharts, IndexedDB, Google Gemini.
 
-## 기술 스택
+[Live demo](https://dashboard-hackathon-inky.vercel.app) · [한국어 소개](README.ko.md) · [Security and deployment](SECURITY.md)
 
-- Next.js 16 App Router
-- React 19
-- TypeScript
-- Tailwind CSS v4 및 custom CSS
-- Recharts
-- lucide-react
-- idb
-- Google Generative AI
+## What it does
 
-## 실행 방법
+- Browses sample datasets across stocks, ETFs, portfolios, financial metrics, and other categories.
+- Converts uploaded files or text into structured summaries, insights, and chart data through Gemini.
+- Supports follow-up prompts that revise an analysis and its visualizations.
+- Organizes uploaded analyses, favorites, and recent activity.
+- Caches datasets and saved analysis locally with IndexedDB.
+
+**Demo scope:** the built-in financial data is sample data, not a live market feed. The sample dashboard can be explored without a Gemini key. AI analysis requires server configuration and the private demo access code.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[React dashboard] --> B[Sample-data routes]
+    A --> C[Protected analysis routes]
+    C --> D[Bounded and validated input]
+    D --> E[Gemini]
+    E --> F[Validated chart and summary JSON]
+    F --> A
+    A --> G[IndexedDB cache]
+```
+
+## Engineering decisions
+
+| Area | Implementation and purpose |
+| --- | --- |
+| Data-driven charts | Category schemas and reusable chart components connect structured analysis to Recharts visualizations. |
+| Local persistence | IndexedDB caches sample datasets and saved analyses; localStorage retains lightweight user preferences. |
+| Server-side AI | The Gemini API key stays on the server rather than in the browser bundle. |
+| Request boundaries | Both AI routes enforce a streamed 1 MiB body limit and share a per-process request cap. |
+| Response handling | Model output is checked before chart fields are merged; unsafe prototype properties and invalid structures are rejected. |
+| Failure handling | Provider errors and raw model responses are not returned to clients or logged as uploaded content. |
+
+## Run locally
+
+Use **Node.js 20.19+**. From the repository root:
 
 ```bash
-npm install
+npm ci
+cp .env.example .env.local
 npm run dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 엽니다.
+Open [localhost:3000](http://localhost:3000). You can browse the sample dashboard before configuring the AI features.
 
-## 환경 변수
+To enable AI analysis, set these server-only variables in `.env.local`:
 
-AI 분석 API를 사용하려면 프로젝트 루트에 `.env.local`을 만들고 아래 값을 설정합니다.
+| Variable | Purpose |
+| --- | --- |
+| `GEMINI_API_KEY` | Your Gemini API credential |
+| `DEMO_ACCESS_TOKEN` | A randomly generated demo access code of at least 32 characters |
+
+The browser asks for the **demo access code**, not the Gemini API key. AI operations are disabled when the server's access code is missing or too short. Environment files must stay outside Git.
+
+## Verify
 
 ```bash
-GEMINI_API_KEY=your_api_key_here
+npm run test:security
+npm run build
 ```
 
-환경 변수 파일은 커밋하지 않습니다.
+Security regression tests cover access control, production configuration, rate limits, forged Content-Length values, bounded multipart/JSON parsing, model-output validation, prototype properties, and error redaction. They do not call a paid Gemini service.
 
-## 자주 쓰는 명령어
+CI runs the security tests, dependency audit, production build, and redacted secret scanning.
 
-```bash
-npm run dev      # 개발 서버 실행
-npm run build    # 프로덕션 빌드 확인
-npm run start    # 빌드 결과 실행
-npm run lint     # ESLint 실행
-```
+## Data flow and deployment
 
-## 프로젝트 구조
+Saved analyses and preferences are browser-local rather than synced through an account database. AI processing sends the selected data through the server to Gemini; it is distinct from local browser caching.
 
-```text
-src/app
-  page.tsx                    # 대시보드 상태와 화면 전환
-  api/process/route.ts         # 업로드 데이터 AI 분석 API
-  api/dummy/...                # 더미 데이터 API
+For Vercel, use the repository root, the Next.js preset, and server environment variables for both the Gemini key and demo access code. The AI request timeout is 30 seconds and the output cap is 8,192 tokens.
 
-src/components
-  HomeDashboard.tsx            # 홈 화면
-  UploadPanel.tsx              # 데이터 불러오기
-  UploadedDataDashboard.tsx    # 내가 올린 데이터
-  DataViewer.tsx               # 상세 화면
-  charts/                      # 상세 차트 컴포넌트
+The six-requests-per-minute cap is per process. A broadly shared paid demo needs a persistent gateway quota and provider usage controls. See [SECURITY.md](SECURITY.md).
 
-src/lib
-  cache.ts                     # IndexedDB 캐시
-  prompts.ts                   # AI 분석 프롬프트
-  types.ts                     # 데이터 타입
+## Code map
 
-src/data/dummy                 # 카테고리별 더미 데이터
-```
-
-## 배포
-
-Vercel 배포를 기본으로 권장합니다.
-
-1. GitHub 저장소에 push합니다.
-2. Vercel에서 프로젝트를 Import합니다.
-3. Framework Preset은 Next.js로 둡니다.
-4. Environment Variables에 `GEMINI_API_KEY`를 추가합니다.
-5. Deploy를 실행합니다.
-
-AI 분석 시간이 길어 Vercel 서버리스 제한에 걸리면 `/api/process`만 Render 같은 별도 백엔드로 분리할 수 있습니다.
-
-## 참고
-
-- 사용자가 업로드한 데이터와 사용자 상태는 브라우저 로컬 저장소 및 IndexedDB에 저장됩니다.
-- 더미 데이터는 앱 시작 시 로컬 캐시에 자동으로 적재됩니다.
-- `skills.md`는 AI 분석 스키마와 카테고리 규칙으로 사용되므로 삭제하지 않습니다.
-
-## 보안 및 데모 접근
-
-보호된 기능에는 32자 이상의 무작위 `DEMO_ACCESS_TOKEN` 설정이 필요합니다. 브라우저에서 접근 코드를 입력하며, 제공업체 API 키나 비밀번호를 입력하지 않습니다. 미설정 시 해당 기능은 차단됩니다. 설정 예제는 `.env.example`을, 테스트 및 배포 제한은 [SECURITY.md](SECURITY.md)를 참고하세요.
-
+- [src/app/page.tsx](src/app/page.tsx): dashboard navigation and analysis flows.
+- [src/app/api/process/route.ts](src/app/api/process/route.ts): initial upload analysis.
+- [src/app/api/reanalyze/route.ts](src/app/api/reanalyze/route.ts): follow-up analysis.
+- [src/lib/ai-security.ts](src/lib/ai-security.ts): authorization, byte limits, and model-output checks.
+- [src/lib/cache.ts](src/lib/cache.ts): IndexedDB persistence.
+- [src/lib/prompts.ts](src/lib/prompts.ts) and [skills.md](skills.md): prompts and analysis schemas.
+- [src/components/charts](src/components/charts): chart components.
